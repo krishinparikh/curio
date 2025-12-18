@@ -11,8 +11,11 @@ export function Header() {
 
   const identity = isLoading ? (
     <>
-      <Skeleton className="h-4 w-24" />
       <Skeleton className="h-8 w-8 rounded-md" />
+      <div className="flex flex-col gap-0">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3 w-16 mt-0.5" />
+      </div>
     </>
   ) : (
     <>
@@ -58,7 +61,7 @@ export function Header() {
       <Link href="/home" className="hover:opacity-80 transition-opacity">
         <Image src="/CurioLogo.png" alt="Curio" width={600} height={200} priority className="h-6 w-auto" />
       </Link>
-      <Link href="/profile" className="flex items-center gap-3 px-2 py-1 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Link href="/profile" className="flex items-center gap-2 px-2 py-1 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         {identity}
       </Link>
     </header>
