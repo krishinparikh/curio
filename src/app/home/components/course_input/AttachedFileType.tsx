@@ -1,4 +1,4 @@
-interface DocumentTypeProps {
+interface AttachedFileTypeProps {
   fileType: string;
 }
 
@@ -8,7 +8,7 @@ const typeColors: Record<string, string> = {
   PNG: "bg-orange-100 text-orange-700",
 };
 
-export function DocumentType({ fileType }: DocumentTypeProps) {
+export function AttachedFileType({ fileType }: AttachedFileTypeProps) {
   const colorClass = typeColors[fileType.toUpperCase()] || "bg-gray-100 text-gray-700";
 
   return (

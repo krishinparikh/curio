@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/input-group";
 import { Paperclip } from "lucide-react";
 import { useState } from "react";
-import { DocumentPreview } from "./DocumentPreview";
+import { AttachedFile } from "./AttachedFile";
 
 interface CourseInputProps {
   topic: string;
@@ -44,8 +44,9 @@ export function CourseInput({ topic, setTopic, isCreatingSession, onKeyDown }: C
       </InputGroupAddon>
       {documentsAttached && (
         <InputGroupAddon align="block-end" className="border-t border-border bg-secondary py-3">
-          <DocumentPreview fileName="BAFI 361 Module 3.pdf" fileType="PDF" />
-          <DocumentPreview fileName="CSDS 393 Diagram.jpg" fileType="JPG" />
+          <AttachedFile fileName="BAFI 361 Module 3.pdf" fileType="PDF" />
+          <AttachedFile fileName="CSDS 393 Diagram.jpg" fileType="JPG" />
+          <AttachedFile fileName="CSDS 393 Diagram.png" fileType="PNG" />
         </InputGroupAddon>
       )}
     </InputGroup>
