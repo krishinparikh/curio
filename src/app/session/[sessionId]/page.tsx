@@ -3,10 +3,10 @@
 import { use, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { SessionHeader } from './components/SessionHeader';
+import { SessionTitleSection } from './components/SessionTitleSection';
 import { SessionDescription } from './components/SessionDescription';
 import { ModuleList } from './components/ModuleList';
-import { Header } from '@/components/Header';
+import { SessionHeader } from './components/SessionHeader';
 import { Spinner } from '@/components/ui/spinner';
 import { useGetSession, useDeleteSession } from './hooks';
 
@@ -48,7 +48,7 @@ export default function SessionPage({ params }: SessionPageProps) {
   if (sessionStatus === 'loading' || getSessionQuery.isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <Header />
+        <SessionHeader />
         <div className="flex-1 flex items-center justify-center">
           <Spinner className="size-12" />
         </div>
@@ -64,9 +64,9 @@ export default function SessionPage({ params }: SessionPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <SessionHeader />
       <div className="mx-auto max-w-7xl p-8">
-        <SessionHeader
+        <SessionTitleSection
           sessionName={session.name}
           sessionId={sessionId}
           completedModules={completedModules}

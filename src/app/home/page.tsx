@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Header } from "../../components/Header";
-import { SessionList } from "./components/SessionList";
+import { HomeHeader } from "./components/HomeHeader";
+import { HomeSidebar } from "./components/HomeSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { Menu } from "lucide-react";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useGetSessions, useCreateSession } from "./hooks";
 
@@ -56,7 +56,6 @@ export default function HomePage() {
   const [topic, setTopic] = useState("");
   const [length, setLength] = useState<"short" | "medium" | "long">("short");
   const [complexity, setComplexity] = useState<"beginner" | "intermediate" | "advanced">("beginner");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isLoading = sessionStatus === "loading" || getUserQuery.isLoading;
   const isCreatingSession = createSessionMutation.isPending;
@@ -74,46 +73,31 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <Spinner className="size-12" />
+      <SidebarProvider defaultOpen={false}>
+        <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
+          <HomeHeader />
+          <div className="flex-1 flex items-center justify-center">
+            <Spinner className="size-12" />
+          </div>
         </div>
-      </div>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
-      <Header />
+    <SidebarProvider defaultOpen={false}>
+      <HomeSidebar sessionData={sessionData} isLoading={getSessionsQuery.isLoading} />
+      <SidebarInset>
+        <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
+          <HomeHeader />
 
-      {/* Loading Overlay for Session Creation */}
-      {isCreatingSession && (
-        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center">
-          <div className="bg-background rounded-lg p-6 sm:p-8 mx-4 flex flex-col items-center gap-4 shadow-xl max-w-md">
-            <Spinner className="size-12" />
-            <p className="text-base sm:text-lg font-medium text-center">Hold tight while your learning session generates...</p>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar */}
-        <SessionList
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          sessionData={sessionData}
-          isLoading={getSessionsQuery.isLoading}
-        />
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Toggle Button */}
-          {!sidebarOpen && (
-            <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
-              <Button variant="outline" size="icon" onClick={() => setSidebarOpen(true)} className="h-8 w-8">
-                <Menu className="h-5 w-5" />
-              </Button>
+          {/* Loading Overlay for Session Creation */}
+          {isCreatingSession && (
+            <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center">
+              <div className="bg-background rounded-lg p-6 sm:p-8 mx-4 flex flex-col items-center gap-4 shadow-xl max-w-md">
+                <Spinner className="size-12" />
+                <p className="text-base sm:text-lg font-medium text-center">Hold tight while your learning session generates...</p>
+              </div>
             </div>
           )}
 
@@ -182,7 +166,7 @@ export default function HomePage() {
             </div>
           </main>
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

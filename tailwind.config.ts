@@ -10,7 +10,10 @@ const config: Config = {
   theme: {
   	extend: {
   		fontFamily: {
-  			bai: ['Bai Jamjuree', 'sans-serif']
+  			bai: [
+  				'Bai Jamjuree',
+  				'sans-serif'
+  			]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -57,6 +60,16 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
   		typography: {
@@ -65,50 +78,50 @@ const config: Config = {
   					maxWidth: 'none',
   					p: {
   						marginTop: '1.5rem',
-  						marginBottom: '1.5rem',
+  						marginBottom: '1.5rem'
   					},
   					'p:first-child': {
-  						marginTop: '0',
+  						marginTop: '0'
   					},
   					'p:last-child': {
-  						marginBottom: '0',
+  						marginBottom: '0'
   					},
   					h1: {
   						marginTop: '2rem',
-  						marginBottom: '1.5rem',
+  						marginBottom: '1.5rem'
   					},
   					'h1:first-child': {
-  						marginTop: '0',
+  						marginTop: '0'
   					},
   					h2: {
   						marginTop: '2rem',
-  						marginBottom: '1.5rem',
+  						marginBottom: '1.5rem'
   					},
   					'h2:first-child': {
-  						marginTop: '0',
+  						marginTop: '0'
   					},
   					h3: {
   						marginTop: '1.75rem',
-  						marginBottom: '1.25rem',
+  						marginBottom: '1.25rem'
   					},
   					'h3:first-child': {
-  						marginTop: '0',
+  						marginTop: '0'
   					},
   					ul: {
   						marginTop: '1.5rem',
-  						marginBottom: '1.5rem',
+  						marginBottom: '1.5rem'
   					},
   					ol: {
   						marginTop: '1.5rem',
-  						marginBottom: '1.5rem',
+  						marginBottom: '1.5rem'
   					},
   					li: {
   						marginTop: '0.75rem',
-  						marginBottom: '0.75rem',
-  					},
-  				},
-  			},
-  		},
+  						marginBottom: '0.75rem'
+  					}
+  				}
+  			}
+  		}
   	}
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
