@@ -16,9 +16,7 @@ export function Header() {
     </>
   ) : (
     <>
-      <span className="text-sm font-medium text-foreground">
-        {session?.user?.name ?? session?.user?.email}
-      </span>
+      
       {session?.user?.image ? (
         <Image
           src={session.user.image}
@@ -44,6 +42,14 @@ export function Header() {
           </svg>
         </div>
       )}
+      <div className="flex flex-col gap-0">
+        <span className="text-sm font-medium text-foreground">
+          {session?.user?.name ?? session?.user?.email}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          Free Plan
+        </span>
+      </div>
     </>
   );
 
