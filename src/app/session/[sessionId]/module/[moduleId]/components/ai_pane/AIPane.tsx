@@ -78,7 +78,7 @@ export function AIPane({ moduleId, userId, open, onOpenChange }: AIPaneProps) {
       className="bg-background border-l flex flex-col overflow-hidden md:flex fixed md:relative inset-0 md:inset-auto w-full md:w-auto z-50 md:z-auto transition-transform duration-300 ease-in-out animate-in slide-in-from-right md:animate-none"
     >
       {/* Chat Messages Area */}
-      <div ref={scrollAreaRef} className="flex-1 overflow-y-auto py-6 px-6 space-y-4">
+      <div ref={scrollAreaRef} className="flex-1 overflow-y-auto py-6 px-7 space-y-4">
         {getMessagesQuery.isLoading ? (
           <div className="space-y-8 py-6">
             <div className="space-y-2">

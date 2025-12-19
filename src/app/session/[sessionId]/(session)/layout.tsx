@@ -14,7 +14,7 @@ export default function SessionLayout({ children, params }: SessionLayoutProps) 
   return (
     <>
       <SessionHeader sessionId={sessionId} />
-      <div className="px-12">
+      <div className="px-14">
         {children}
       </div>
     </>

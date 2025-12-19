@@ -19,7 +19,7 @@ export function HomeHeader() {
           onClick={toggleSidebar}
           className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted p-1"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="!h-5 !w-5" />
         </Button>
       }
       mainContent={
