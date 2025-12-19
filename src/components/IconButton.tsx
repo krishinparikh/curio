@@ -19,7 +19,7 @@ export function IconButton({
   return (
     <Button
       variant={variant}
-      className={cn("flex items-center gap-2 py-2 h-auto", className)}
+      className={cn("flex items-center gap-2", className)}
       {...props}
     >
       {iconOnLeft && icon}

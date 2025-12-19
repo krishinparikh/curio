@@ -16,8 +16,8 @@ export function Content({ moduleId, isPaneOpen }: ContentProps) {
   const getModuleQuery = useGetModule(moduleId, userId);
 
   const containerClasses = isPaneOpen
-    ? "py-8 px-14 w-full max-w-6xl"
-    : "py-8 px-14 w-full max-w-6xl mx-auto";
+    ? "p-4 w-full max-w-6xl"
+    : "p-4 w-full max-w-6xl mx-auto";
 
   if (getModuleQuery.isLoading) {
     return (
@@ -45,8 +45,10 @@ export function Content({ moduleId, isPaneOpen }: ContentProps) {
 
   return (
     <div className={containerClasses}>
-      <div className="prose prose-base dark:prose-invert max-w-none">
-        <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
+      <div className="bg-card rounded p-10 shadow">
+        <div className="prose prose-base dark:prose-invert max-w-none">
+          <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
+        </div>
       </div>
     </div>
   );
