@@ -6,8 +6,10 @@ import { useSession } from 'next-auth/react';
 import { SessionTitleSection } from './components/SessionTitleSection';
 import { SessionDescription } from './components/SessionDescription';
 import { ModuleList } from './components/ModuleList';
+import DescriptionCard from './components/DescriptionCard';
 import { Spinner } from '@/components/ui/spinner';
 import { useGetSession, useDeleteSession } from './hooks';
+import { formatDate } from '@/lib/utils';
 
 interface SessionPageProps {
   params: Promise<{
@@ -61,31 +63,41 @@ export default function SessionPage({ params }: SessionPageProps) {
   const { session, totalModules, completedModules, inferredLength } = sessionData;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="py-8">
+    <div className="min-h-screen bg-secondary">
+      <div className="py-4">
         <SessionTitleSection
           sessionName={session.name}
-          sessionId={sessionId}
           completedModules={completedModules}
           totalModules={totalModules}
-          onDelete={() => deleteSessionMutation.mutate(sessionId)}
-          isDeleting={deleteSessionMutation.isPending}
         />
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Side - Session Description */}
-          <div>
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Left Side - Session Info */}
+          <div className="flex-1 space-y-4">
             <SessionDescription
               description={session.description}
-              sessionName={session.name}
-              inferredLength={inferredLength}
-              lastUpdated={session.lastUpdated}
             />
+
+            {/* Three Cards in a Row */}
+            <div className="grid grid-cols-3 gap-4">
+              <DescriptionCard
+                heading="Length"
+                value={inferredLength.charAt(0).toUpperCase() + inferredLength.slice(1)}
+              />
+              <DescriptionCard
+                heading="Difficulty"
+                value="Intermediate"
+              />
+              <DescriptionCard
+                heading="Last Updated"
+                value={formatDate(session.lastUpdated)}
+              />
+            </div>
           </div>
 
           {/* Right Side - Module List */}
-          <div>
+          <div className="flex-1">
             <ModuleList
               sessionId={sessionId}
               modules={session.modules}

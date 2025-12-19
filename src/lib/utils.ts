@@ -7,8 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
+export function constructModuleName(order: number, name: string): string {
+  return `${order + 1}. ${name}`;
 }
