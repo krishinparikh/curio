@@ -1,13 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
-interface IconButtonProps {
+interface IconButtonProps extends Omit<ButtonProps, "children"> {
   icon: ReactNode;
   iconOnLeft?: boolean;
-  variant?: "default" | "outline" | "ghost" | "secondary" | "destructive" | "link";
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
   children?: ReactNode;
 }
 
@@ -15,17 +12,15 @@ export function IconButton({
   icon,
   iconOnLeft = false,
   variant = "default",
-  onClick,
-  disabled = false,
-  className = "",
+  className,
   children,
+  ...props
 }: IconButtonProps) {
   return (
     <Button
       variant={variant}
-      onClick={onClick}
-      disabled={disabled}
-      className={`flex items-center gap-2 ${className}`}
+      className={cn("flex items-center gap-2 py-2 h-auto", className)}
+      {...props}
     >
       {iconOnLeft && icon}
       {children}

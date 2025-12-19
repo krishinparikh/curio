@@ -6,8 +6,8 @@ interface HeaderProps {
 
 export function Header({ leftAction, mainContent, rightActions }: HeaderProps) {
   return (
-    <header className="px-6 border-b">
-      <div className="grid grid-cols-[2.5rem_1fr_auto] items-center h-14">
+    <header className="px-4 border-b">
+      <div className="grid grid-cols-[2rem_1fr_auto] items-center h-14">
         {/* Left: Fixed width for toggle button or spacer */}
         <div className="flex items-center justify-start">
           {leftAction}

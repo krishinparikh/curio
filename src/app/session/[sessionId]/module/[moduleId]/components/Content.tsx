@@ -16,40 +16,32 @@ export function Content({ moduleId }: ContentProps) {
 
   if (getModuleQuery.isLoading) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-muted-foreground text-center">Loading module content...</p>
-        </div>
+      <div className="py-8 px-12 w-full max-w-6xl">
+        <p className="text-muted-foreground text-center">Loading module content...</p>
       </div>
     );
   }
 
   if (getModuleQuery.error) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-destructive text-center">Error loading module content</p>
-        </div>
+      <div className="py-8 px-12 w-full max-w-6xl">
+        <p className="text-destructive text-center">Error loading module content</p>
       </div>
     );
   }
 
   if (!getModuleQuery.data) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-muted-foreground text-center">Module not found</p>
-        </div>
+      <div className="py-8 px-12 w-full max-w-6xl">
+        <p className="text-muted-foreground text-center">Module not found</p>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-4xl px-6 py-8">
-        <div className="prose prose-base dark:prose-invert max-w-none">
-          <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
-        </div>
+    <div className="py-8 px-12 w-full max-w-6xl">
+      <div className="prose prose-base dark:prose-invert max-w-none">
+        <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
       </div>
     </div>
   );
