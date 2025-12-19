@@ -63,7 +63,7 @@ export default function SessionPage({ params }: SessionPageProps) {
   const { session, totalModules, completedModules, inferredLength } = sessionData;
 
   return (
-    <div className="min-h-screen bg-secondary">
+    <div className="min-h-screen bg-slate-50">
       <div className="py-4">
         <SessionTitleSection
           sessionName={session.name}
