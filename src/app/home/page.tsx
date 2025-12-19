@@ -106,7 +106,7 @@ export default function HomePage() {
 
           <main className="flex-1 flex justify-center px-4 sm:px-6 pt-16 sm:pt-24">
             <div className="w-full max-w-3xl flex flex-col items-center space-y-10 sm:space-y-8 md:space-y-10">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-primary max-w-2xl px-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-center text-primary max-w-2xl px-4">
                 {firstName ? `What do you want to learn today, ${firstName}?` : "What do you want to learn today?"}
               </h1>
 

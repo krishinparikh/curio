@@ -86,7 +86,7 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
             variant="outline"
             onClick={handleComplete}
             disabled={markModuleCompleteMutation.isPending || isModuleComplete}
-            className="bg-white text-black"
+            className="bg-white text-black hover:bg-secondary hover:text-primary"
           >
             Mark Complete
           </IconButton>

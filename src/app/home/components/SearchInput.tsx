@@ -15,7 +15,7 @@ interface SearchInputProps {
 
 export function SearchInput({ value, onChange }: SearchInputProps) {
   return (
-    <InputGroup className="bg-secondary border-none h-10">
+    <InputGroup className="bg-secondary border-none h-12">
       <InputGroupAddon>
         <InputGroupText>
           <Search />

@@ -3,6 +3,7 @@
 import { ModuleHeader } from "./components/ModuleHeader";
 import { AIPane } from "./components/ai_pane/AIPane";
 import { Content } from "./components/Content";
+import { ModuleFooter } from "./components/ModuleFooter";
 import { use, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -21,16 +22,17 @@ export default function ModulePage({ params }: ModulePageProps) {
   const [isPaneOpen, setIsPaneOpen] = useState(true);
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
       <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
 
       {/* Main Content Area - Resizable Panels */}
-      <PanelGroup direction="horizontal" className="flex-1">
+      <PanelGroup direction="horizontal" className="flex-1 overflow-hidden">
         {/* Left: Module Content */}
         <Panel defaultSize={60} minSize={30}>
           <div className="h-full flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto scrollbar-hide">
-              <Content moduleId={moduleId} />
+              <Content moduleId={moduleId} isPaneOpen={isPaneOpen} />
+              <ModuleFooter isPaneOpen={isPaneOpen} />
             </div>
           </div>
         </Panel>

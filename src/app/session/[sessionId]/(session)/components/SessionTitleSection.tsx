@@ -25,7 +25,6 @@ interface SessionTitleSectionProps {
 
 export function SessionTitleSection({
   sessionName,
-  sessionId,
   completedModules,
   totalModules,
   onDelete,
@@ -84,7 +83,7 @@ export function SessionTitleSection({
       </div>
 
       {/* Header with Title */}
-      <h1 className="text-4xl font-bold mb-4">{sessionName}</h1>
+      <h1 className="text-3xl font-medium mb-4">{sessionName}</h1>
 
       {/* Progress Bar */}
       <div>

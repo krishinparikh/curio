@@ -6,17 +6,22 @@ import MarkdownRenderer from '@/app/MarkdownRenderer';
 
 interface ContentProps {
   moduleId: string;
+  isPaneOpen: boolean;
 }
 
-export function Content({ moduleId }: ContentProps) {
+export function Content({ moduleId, isPaneOpen }: ContentProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
 
   const getModuleQuery = useGetModule(moduleId, userId);
 
+  const containerClasses = isPaneOpen
+    ? "py-8 px-14 w-full max-w-6xl"
+    : "py-8 px-14 w-full max-w-6xl mx-auto";
+
   if (getModuleQuery.isLoading) {
     return (
-      <div className="py-8 px-14 w-full max-w-6xl">
+      <div className={containerClasses}>
         <p className="text-muted-foreground text-center">Loading module content...</p>
       </div>
     );
@@ -24,7 +29,7 @@ export function Content({ moduleId }: ContentProps) {
 
   if (getModuleQuery.error) {
     return (
-      <div className="py-8 px-12 w-full max-w-6xl">
+      <div className={containerClasses}>
         <p className="text-destructive text-center">Error loading module content</p>
       </div>
     );
@@ -32,14 +37,14 @@ export function Content({ moduleId }: ContentProps) {
 
   if (!getModuleQuery.data) {
     return (
-      <div className="py-8 px-12 w-full max-w-6xl">
+      <div className={containerClasses}>
         <p className="text-muted-foreground text-center">Module not found</p>
       </div>
     );
   }
 
   return (
-    <div className="py-8 px-14 w-full max-w-6xl">
+    <div className={containerClasses}>
       <div className="prose prose-base dark:prose-invert max-w-none">
         <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
       </div>
