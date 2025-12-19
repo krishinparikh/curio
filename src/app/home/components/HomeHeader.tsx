@@ -11,20 +11,22 @@ export function HomeHeader() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <Header>
-      <div className="flex items-center gap-3">
+    <Header
+      leftAction={
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted p-0"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted p-1"
         >
-          <Menu className="h-4 w-4" />
+          <Menu className="h-5 w-5" />
         </Button>
+      }
+      mainContent={
         <Link href="/home" className="hover:opacity-80 transition-opacity">
           <Image src="/CurioLogo.png" alt="Curio" width={600} height={200} priority className="h-6 w-auto" />
         </Link>
-      </div>
-    </Header>
+      }
+    />
   );
 }

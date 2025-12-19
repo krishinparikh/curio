@@ -175,7 +175,6 @@ src/
                    SessionHeader.tsx
                    ai_pane/
                        AIPane.tsx
-                       AIPaneHeader.tsx
                        AIPaneInput.tsx
                        ChatMessage.tsx
                        FollowUpQuestions.tsx

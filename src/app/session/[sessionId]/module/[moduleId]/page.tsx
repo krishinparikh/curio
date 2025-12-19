@@ -1,7 +1,6 @@
 "use client";
 
 import { ModuleHeader } from "./components/ModuleHeader";
-import { ModuleTitleSection } from "./components/ModuleTitleSection";
 import { AIPane } from "./components/ai_pane/AIPane";
 import { Content } from "./components/Content";
 import { use, useState } from "react";
@@ -19,19 +18,18 @@ export default function ModulePage({ params }: ModulePageProps) {
   const { sessionId, moduleId } = use(params);
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
-  const [isPaneOpen, setIsPaneOpen] = useState(false);
+  const [isPaneOpen, setIsPaneOpen] = useState(true);
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
-      <ModuleHeader />
+      <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
 
       {/* Main Content Area - Resizable Panels */}
       <PanelGroup direction="horizontal" className="flex-1">
-        {/* Left: Session Header + Module Content */}
+        {/* Left: Module Content */}
         <Panel defaultSize={60} minSize={30}>
           <div className="h-full flex flex-col overflow-hidden">
-            <ModuleTitleSection sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto scrollbar-hide">
               <Content moduleId={moduleId} />
             </div>
           </div>

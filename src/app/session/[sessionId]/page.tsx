@@ -48,7 +48,7 @@ export default function SessionPage({ params }: SessionPageProps) {
   if (sessionStatus === 'loading' || getSessionQuery.isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <SessionHeader />
+        <SessionHeader sessionId={sessionId} />
         <div className="flex-1 flex items-center justify-center">
           <Spinner className="size-12" />
         </div>
@@ -64,35 +64,37 @@ export default function SessionPage({ params }: SessionPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <SessionHeader />
-      <div className="mx-auto max-w-7xl p-8">
-        <SessionTitleSection
-          sessionName={session.name}
-          sessionId={sessionId}
-          completedModules={completedModules}
-          totalModules={totalModules}
-          onDelete={() => deleteSessionMutation.mutate(sessionId)}
-          isDeleting={deleteSessionMutation.isPending}
-        />
+      <SessionHeader sessionId={sessionId} />
+      <div className="px-6 py-8">
+        <div className="pl-[2.5rem]">
+          <SessionTitleSection
+            sessionName={session.name}
+            sessionId={sessionId}
+            completedModules={completedModules}
+            totalModules={totalModules}
+            onDelete={() => deleteSessionMutation.mutate(sessionId)}
+            isDeleting={deleteSessionMutation.isPending}
+          />
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Side - Session Description */}
-          <div>
-            <SessionDescription
-              description={session.description}
-              sessionName={session.name}
-              inferredLength={inferredLength}
-              lastUpdated={session.lastUpdated}
-            />
-          </div>
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Side - Session Description */}
+            <div>
+              <SessionDescription
+                description={session.description}
+                sessionName={session.name}
+                inferredLength={inferredLength}
+                lastUpdated={session.lastUpdated}
+              />
+            </div>
 
-          {/* Right Side - Module List */}
-          <div>
-            <ModuleList
-              sessionId={sessionId}
-              modules={session.modules}
-            />
+            {/* Right Side - Module List */}
+            <div>
+              <ModuleList
+                sessionId={sessionId}
+                modules={session.modules}
+              />
+            </div>
           </div>
         </div>
       </div>

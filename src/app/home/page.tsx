@@ -74,12 +74,15 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <SidebarProvider defaultOpen={false}>
-        <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
-          <HomeHeader />
-          <div className="flex-1 flex items-center justify-center">
-            <Spinner className="size-12" />
+        <HomeSidebar sessionData={[]} isLoading={true} />
+        <SidebarInset>
+          <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
+            <HomeHeader />
+            <div className="flex-1 flex items-center justify-center">
+              <Spinner className="size-12" />
+            </div>
           </div>
-        </div>
+        </SidebarInset>
       </SidebarProvider>
     );
   }
