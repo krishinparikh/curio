@@ -92,7 +92,7 @@ export function SessionTitleSection({
           <span>Progress</span>
           <span>{completedModules} of {totalModules} modules completed</span>
         </div>
-        <div className="h-3 bg-secondary rounded-full overflow-hidden">
+        <div className="h-3 bg-input rounded-full overflow-hidden">
           <div
             className="h-full bg-primary transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}

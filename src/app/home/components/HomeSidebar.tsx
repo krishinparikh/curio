@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { useState, useMemo } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +9,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { SearchInput } from "./SearchInput";
 import { SessionCard } from "./SessionCard";
 import { NavUser } from "./NavUser";
 
@@ -26,47 +27,48 @@ interface HomeSidebarProps {
 }
 
 export function HomeSidebar({ sessionData, isLoading }: HomeSidebarProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredSessions = useMemo(() => {
+    if (!searchQuery.trim()) return sessionData;
+
+    return sessionData.filter((session) =>
+      session.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [sessionData, searchQuery]);
+
   return (
     <Sidebar>
-      <SidebarHeader>
-        <div className="px-4 py-4">
-          <Image
-            src="/CurioLogo.png"
-            alt="Curio"
-            width={600}
-            height={200}
-            priority
-            className="h-6 w-auto"
-          />
+      <SidebarHeader className="p-0">
+        <div className="px-4 h-20 flex items-center">
+          <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
-          <SidebarGroupContent>
-            <div className="space-y-4 px-2">
-              {isLoading ? (
-                <p className="text-muted-foreground text-center py-8">Loading sessions...</p>
-              ) : sessionData.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No learning sessions yet. Create one to get started!
-                </p>
-              ) : (
-                sessionData.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    id={session.id}
-                    title={session.title}
-                    progress={session.progress}
-                    modulesCompleted={session.modulesCompleted}
-                    totalModules={session.totalModules}
-                  />
-                ))
-              )}
-            </div>
+          <SidebarGroupContent className="py-2 space-y-4 px-2">
+            {isLoading ? (
+              <p className="text-muted-foreground text-center py-8">Loading sessions...</p>
+            ) : filteredSessions.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                {searchQuery.trim() ? "No sessions found." : "No learning sessions yet. Create one to get started!"}
+              </p>
+            ) : (
+              filteredSessions.map((session) => (
+                <SessionCard
+                  key={session.id}
+                  id={session.id}
+                  title={session.title}
+                  progress={session.progress}
+                  modulesCompleted={session.modulesCompleted}
+                  totalModules={session.totalModules}
+                />
+              ))
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-input">
         <NavUser />
       </SidebarFooter>
     </Sidebar>
