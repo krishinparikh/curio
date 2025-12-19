@@ -76,10 +76,10 @@ export default function HomePage() {
       <SidebarProvider defaultOpen={false}>
         <HomeSidebar sessionData={[]} isLoading={true} />
         <SidebarInset>
-          <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
+          <div className="h-screen bg-background flex flex-col overflow-hidden">
             <HomeHeader />
             <div className="flex-1 flex items-center justify-center">
-              <Spinner className="size-12" />
+              <Spinner className="size-12 text-primary" />
             </div>
           </div>
         </SidebarInset>
@@ -91,22 +91,22 @@ export default function HomePage() {
     <SidebarProvider defaultOpen={false}>
       <HomeSidebar sessionData={sessionData} isLoading={getSessionsQuery.isLoading} />
       <SidebarInset>
-        <div className="h-screen bg-gradient-to-b from-background via-accent/5 to-accent/20 flex flex-col overflow-hidden">
+        <div className="h-screen bg-background flex flex-col overflow-hidden">
           <HomeHeader />
 
           {/* Loading Overlay for Session Creation */}
           {isCreatingSession && (
-            <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center">
-              <div className="bg-background rounded-lg p-6 sm:p-8 mx-4 flex flex-col items-center gap-4 shadow-xl max-w-md">
-                <Spinner className="size-12" />
-                <p className="text-base sm:text-lg font-medium text-center">Hold tight while your learning session generates...</p>
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center">
+              <div className="bg-card border border-border rounded-xl p-8 mx-4 flex flex-col items-center gap-6 shadow-2xl max-w-md">
+                <Spinner className="size-12 text-primary" />
+                <p className="text-base sm:text-lg font-medium text-center text-foreground">Hold tight while your learning session generates...</p>
               </div>
             </div>
           )}
 
           <main className="flex-1 flex justify-center px-4 sm:px-6 pt-16 sm:pt-24">
             <div className="w-full max-w-3xl flex flex-col items-center space-y-10 sm:space-y-8 md:space-y-10">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-center text-primary max-w-2xl px-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-foreground max-w-2xl px-4">
                 {firstName ? `What do you want to learn today, ${firstName}?` : "What do you want to learn today?"}
               </h1>
 
@@ -115,7 +115,7 @@ export default function HomePage() {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={isCreatingSession}
-                className="w-full max-w-2xl h-32 !text-lg resize-none rounded-2xl px-4 py-4 shadow-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="w-full max-w-2xl h-32 !text-lg resize-none rounded-xl px-4 py-4 bg-card border-border shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0"
               />
 
               <RadioGroup
@@ -160,7 +160,7 @@ export default function HomePage() {
 
               <Button
                 size="lg"
-                className="w-full max-w-2xl h-14 text-base font-semibold"
+                className="w-full max-w-2xl h-14 text-base font-semibold rounded-xl shadow-sm hover:shadow-md transition-shadow"
                 onClick={handleCreateSession}
                 disabled={isCreatingSession || !topic.trim()}
               >

@@ -11,10 +11,10 @@ export function NavUser() {
 
   const identity = isLoading ? (
     <>
-      <Skeleton className="h-8 w-8 rounded-md" />
-      <div className="flex flex-col gap-0">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-3 w-16 mt-0.5" />
+      <Skeleton className="h-9 w-9 rounded-lg" />
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-3.5 w-24" />
+        <Skeleton className="h-3 w-16" />
       </div>
     </>
   ) : (
@@ -23,14 +23,14 @@ export function NavUser() {
         <Image
           src={session.user.image}
           alt={session?.user?.name ?? "User avatar"}
-          width={32}
-          height={32}
-          className="h-8 w-8 rounded-md object-cover"
+          width={36}
+          height={36}
+          className="h-9 w-9 rounded-lg object-cover border border-sidebar-border"
         />
       ) : (
-        <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+        <div className="h-9 w-9 rounded-lg bg-sidebar-accent border border-sidebar-border flex items-center justify-center">
           <svg
-            className="h-4 w-4 text-muted-foreground"
+            className="h-5 w-5 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -44,8 +44,8 @@ export function NavUser() {
           </svg>
         </div>
       )}
-      <div className="flex flex-col gap-0">
-        <span className="text-sm font-medium text-foreground">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium text-sidebar-foreground">
           {session?.user?.name ?? session?.user?.email}
         </span>
         <span className="text-xs text-muted-foreground">
@@ -58,7 +58,7 @@ export function NavUser() {
   return (
     <Link
       href="/profile"
-      className="flex items-center gap-2 px-2 py-2 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+      className="flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
     >
       {identity}
     </Link>

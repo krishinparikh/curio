@@ -39,14 +39,14 @@ export function HomeSidebar({ sessionData, isLoading }: HomeSidebarProps) {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-0">
-        <div className="px-4 h-20 flex items-center">
+      <SidebarHeader className="p-0 border-b border-sidebar-border">
+        <div className="px-3 py-4 flex items-center">
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
       </SidebarHeader>
       <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
-          <SidebarGroupContent className="py-2 space-y-4 px-2">
+          <SidebarGroupContent className="py-3 space-y-2 px-3">
             {isLoading ? (
               <p className="text-muted-foreground text-center py-8">Loading sessions...</p>
             ) : filteredSessions.length === 0 ? (
@@ -68,7 +68,7 @@ export function HomeSidebar({ sessionData, isLoading }: HomeSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-input">
+      <SidebarFooter className="border-t border-sidebar-border p-3">
         <NavUser />
       </SidebarFooter>
     </Sidebar>

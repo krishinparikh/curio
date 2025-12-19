@@ -18,9 +18,9 @@ export function HomeHeader() {
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="h-8 w-8 text-secondary-foreground hover:text-foreground hover:bg-muted p-1"
+            className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
           >
-            <Menu className="!h-5 !w-5" />
+            <Menu className="h-5 w-5" />
           </Button>
         }
         mainContent={

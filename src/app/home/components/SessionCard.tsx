@@ -13,17 +13,14 @@ interface SessionCardProps {
 
 export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
   return (
-    <Link href={`/session/${id}`} className="block">
-      <div className="px-5 py-5 border border-input rounded-md hover:bg-secondary">
-
-      
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-medium text-foreground truncate">{title}</h3>
-          {/* <span className="text-lg font-semibold">{progress}%</span> */}
+    <Link href={`/session/${id}`} className="block group">
+      <div className="px-4 py-4 border border-sidebar-border rounded-lg hover:bg-sidebar-accent hover:border-sidebar-accent-foreground/20 transition-all duration-200">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-sidebar-foreground group-hover:text-sidebar-accent-foreground truncate">{title}</h3>
         </div>
-        <Progress value={progress} className="my-2 h-2 bg-input" />
+        <Progress value={progress} className="h-1.5 mb-2 bg-sidebar-border" />
         <p className="text-xs text-muted-foreground">
-          {modulesCompleted}/{totalModules} Modules Completed
+          {modulesCompleted}/{totalModules} modules completed
         </p>
       </div>
     </Link>

@@ -50,7 +50,7 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
 
   return (
     <Header
-      className="bg-neutral-50 shadow-sm"
+      className="bg-background shadow-sm"
       mainContent={
         <>
           <Link href="/home" className="hover:opacity-80 transition-opacity">
@@ -86,7 +86,6 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
             iconOnLeft={true}
             variant="outline"
             onClick={onTogglePane}
-            className="bg-white text-black hover:bg-secondary hover:text-primary"
           >
             AI Tutor
           </IconButton>
@@ -96,7 +95,6 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
             variant="default"
             onClick={handleComplete}
             disabled={markModuleCompleteMutation.isPending || isModuleComplete}
-            className="bg-primary text-white"
           >
             Mark Complete
           </IconButton>

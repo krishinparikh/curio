@@ -96,7 +96,7 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="hover:bg-secondary hover:text-secondary-foreground" disabled={deleteSessionMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteSessionMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

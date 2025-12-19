@@ -15,15 +15,15 @@ interface SearchInputProps {
 
 export function SearchInput({ value, onChange }: SearchInputProps) {
   return (
-    <InputGroup className="bg-secondary border-none h-12">
+    <InputGroup className="bg-sidebar-accent !border-sidebar-border h-10 !rounded-lg">
       <InputGroupAddon>
         <InputGroupText>
-          <Search />
+          <Search className="h-4 w-4 text-muted-foreground" />
         </InputGroupText>
       </InputGroupAddon>
       <InputGroupInput
-        placeholder="Search for Courses"
-        className="focus-visible:ring-0 focus-visible:ring-offset-0"
+        placeholder="Search sessions"
+        className="focus-visible:ring-0 focus-visible:ring-offset-0 text-sm bg-transparent placeholder:text-muted-foreground"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
