@@ -155,19 +155,19 @@ export default function ProfilePage() {
 
         {/* Alerts */}
         {errorMessage && (
-          <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <div className="mb-6 rounded border border-destructive/50 bg-destructive/10 p-4">
             <p className="text-sm font-medium text-destructive">{errorMessage}</p>
           </div>
         )}
 
         {!errorMessage && successMessage && (
-          <div className="mb-6 rounded-lg border border-emerald-500/50 bg-emerald-500/10 p-4">
+          <div className="mb-6 rounded border border-emerald-500/50 bg-emerald-500/10 p-4">
             <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{successMessage}</p>
           </div>
         )}
 
         {/* Profile Card */}
-        <div className="rounded-xl border bg-card shadow-sm">
+        <div className="rounded border border-border bg-card shadow-sm">
           <form onSubmit={handleSave}>
             <div className="px-6 py-8">
               <div className="flex items-start gap-8">
@@ -267,7 +267,7 @@ export default function ProfilePage() {
 
             {/* Action Buttons */}
             {isEditing && (
-              <div className="flex gap-3 border-t bg-muted/50 px-6 py-4">
+              <div className="flex gap-3 border-t border-border bg-muted/50 px-6 py-4">
                 <Button type="submit" disabled={updateUserMutation.isPending} className="flex-1 sm:flex-initial">
                   {updateUserMutation.isPending ? "Saving..." : "Save changes"}
                 </Button>

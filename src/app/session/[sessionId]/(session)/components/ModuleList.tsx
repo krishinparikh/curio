@@ -15,7 +15,7 @@ interface ModuleListProps {
 
 export function ModuleList({ sessionId, modules }: ModuleListProps) {
   return (
-    <div className="rounded-lg bg-background p-4 shadow-sm">
+    <div className="rounded bg-card p-4 shadow">
       {/* <h3 className="text-sm text-muted-foreground mb-2">Modules</h3> */}
       <div>
         {modules.map((module, index) => (

@@ -15,7 +15,7 @@
     --tracking-widest: calc(var(--tracking-normal) + 0.1em)
   }
   :root {
-    --background: oklch(1.0000 0 0);
+    --background: oklch(98.4% 0.003 247.858);
     --foreground: oklch(0.2150 0.0413 226.4655);
     --card: oklch(1.0000 0 0);
     --card-foreground: oklch(0.2150 0.0413 226.4655);
@@ -59,14 +59,14 @@
     --shadow-offset-y: 1px;
     --letter-spacing: 0em;
     --spacing: 0.25rem;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --shadow-2xs: 0 0 1px 0px hsl(0 0% 0% / 0.02);
+    --shadow-xs: 0 0 2px 0px hsl(0 0% 0% / 0.03);
+    --shadow-sm: 0 0 3px 0px hsl(0 0% 0% / 0.04);
+    --shadow: 0 0 4px 0px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 0 6px 0px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 0 8px 0px hsl(0 0% 0% / 0.07);
+    --shadow-xl: 0 0 12px 0px hsl(0 0% 0% / 0.08);
+    --shadow-2xl: 0 0 16px 0px hsl(0 0% 0% / 0.09);
     --tracking-normal: 0em
   }
   .dark {
@@ -114,14 +114,14 @@
     --shadow-offset-y: 1px;
     --letter-spacing: 0em;
     --spacing: 0.25rem;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25)
+    --shadow-2xs: 0 0 1px 0px hsl(0 0% 0% / 0.02);
+    --shadow-xs: 0 0 2px 0px hsl(0 0% 0% / 0.03);
+    --shadow-sm: 0 0 3px 0px hsl(0 0% 0% / 0.04);
+    --shadow: 0 0 4px 0px hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 0 6px 0px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 0 8px 0px hsl(0 0% 0% / 0.07);
+    --shadow-xl: 0 0 12px 0px hsl(0 0% 0% / 0.08);
+    --shadow-2xl: 0 0 16px 0px hsl(0 0% 0% / 0.09)
   }
   body {
     letter-spacing: var(--tracking-normal);

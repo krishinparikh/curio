@@ -12,7 +12,7 @@ export function SessionTitleSection({
   const progressPercentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   return (
-    <div className="mb-4 rounded-lg bg-background p-8 shadow-sm">
+    <div className="mb-4 rounded bg-card p-8 shadow">
       {/* Header with Title */}
       <h1 className="text-3xl font-medium mb-4">{sessionName}</h1>
 

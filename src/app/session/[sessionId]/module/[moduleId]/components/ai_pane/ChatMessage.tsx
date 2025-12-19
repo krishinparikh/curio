@@ -10,7 +10,7 @@ const chatMessageVariants = cva(
   {
     variants: {
       variant: {
-        user: "bg-muted rounded-2xl px-4 py-3 inline-block",
+        user: "bg-muted rounded px-4 py-3 inline-block",
         ai: "w-full",
       },
     },

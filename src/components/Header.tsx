@@ -7,7 +7,7 @@ interface HeaderProps {
 
 export function Header({ leftAction, mainContent, rightActions, className }: HeaderProps) {
   return (
-    <header className={`border-b ${className || ''}`}>
+    <header className={`bg-card border-b border-border ${className || ''}`}>
       <div className="grid grid-cols-[2.5rem_1fr_auto] items-center h-14 px-4">
         {/* Left: Fixed width for toggle button or spacer */}
         <div className="flex items-center justify-start">

@@ -15,13 +15,12 @@ export function ModuleCard({
   moduleId,
   moduleName,
   moduleOverview,
-  moduleOrder,
-  isComplete,
+  moduleOrder
 }: ModuleCardProps) {
   return (
     <Link href={`/session/${sessionId}/module/${moduleId}`}>
       <div className="group relative p-4 hover:bg-accent transition-colors cursor-pointer">
-        <h3 className="font-semibold text-base group-hover:text-accent-foreground transition-colors mb-2">
+        <h3 className="font-medium text-base group-hover:text-accent-foreground transition-colors mb-2">
           {constructModuleName(moduleOrder, moduleName)}
         </h3>
         <p className="text-sm text-muted-foreground line-clamp-2">

@@ -10,7 +10,7 @@ export default function SignInButton() {
       onClick={() => signIn("google", { callbackUrl: "/home" })}
       variant="outline"
       size="lg"
-      className="bg-white text-gray-700 border border-gray-300 px-8 py-4 text-lg font-medium rounded-lg flex items-center gap-3 hover:bg-white hover:text-gray-700 hover:border-gray-300"
+      className="bg-white text-gray-700 border border-border px-8 py-4 text-lg font-medium rounded flex items-center gap-3 hover:bg-white hover:text-gray-700 hover:border-border"
     >
       <Image
         src="/GoogleIcon.png"

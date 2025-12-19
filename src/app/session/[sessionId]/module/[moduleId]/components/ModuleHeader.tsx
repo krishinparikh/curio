@@ -50,7 +50,7 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
 
   return (
     <Header
-      className="bg-background shadow-sm"
+      className="bg-background shadow"
       mainContent={
         <>
           <Link href="/home" className="hover:opacity-80 transition-opacity">
