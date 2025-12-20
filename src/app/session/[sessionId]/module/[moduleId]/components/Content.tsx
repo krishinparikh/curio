@@ -45,8 +45,8 @@ export function Content({ moduleId, isPaneOpen }: ContentProps) {
 
   return (
     <div className={containerClasses}>
-      <div className="bg-card rounded p-10 shadow">
-        <div className="prose prose-base dark:prose-invert max-w-none">
+      <div className="bg-card rounded p-4 md:p-10 shadow">
+        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
           <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
         </div>
       </div>

@@ -62,8 +62,8 @@ export function AppSidebar() {
       <SidebarHeader className="p-0 gap-0">
         <div className="h-14 flex items-center px-4 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
           <Link href="/home" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Image src="/CurioLogo.png" alt="Curio" width={600} height={200} priority className="h-8 w-auto group-data-[collapsible=icon]:hidden" />
-            <Image src="/CurioIcon.png" alt="Curio" width={200} height={200} priority className="h-8 w-8 hidden group-data-[collapsible=icon]:block" />
+            <Image src="/CurioLogo.png" alt="Curio" width={600} height={200} priority className="h-7 w-auto group-data-[collapsible=icon]:hidden" />
+            <Image src="/CurioIcon.png" alt="Curio" width={200} height={200} priority className="h-7 w-7 hidden group-data-[collapsible=icon]:block" />
           </Link>
         </div>
         <div className="px-4 group-data-[collapsible=icon]:hidden">

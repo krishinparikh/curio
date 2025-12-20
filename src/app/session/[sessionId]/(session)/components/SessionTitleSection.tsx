@@ -12,15 +12,15 @@ export function SessionTitleSection({
   const progressPercentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   return (
-    <div className="mb-4 rounded bg-card p-8 shadow">
+    <div className="mb-4 rounded bg-card p-4 sm:p-8 shadow">
       {/* Header with Title */}
-      <h1 className="text-3xl font-medium mb-4">{sessionName}</h1>
+      <h1 className="text-xl sm:text-3xl font-medium mb-4">{sessionName}</h1>
 
       {/* Progress Bar */}
       <div>
-        <div className="flex justify-between text-sm text-muted-foreground mb-1">
+        <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1">
           <span>Progress</span>
-          <span>{completedModules} of {totalModules} modules completed</span>
+          <span className="text-right">{completedModules} of {totalModules} modules completed</span>
         </div>
         <div className="h-3 bg-input rounded-full overflow-hidden">
           <div

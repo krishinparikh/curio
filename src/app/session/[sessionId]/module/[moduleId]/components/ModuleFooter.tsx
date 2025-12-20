@@ -16,17 +16,19 @@ export function ModuleFooter({ isPaneOpen }: ModuleFooterProps) {
     <div className={containerClasses}>
       <div className="flex justify-between items-center">
         <IconButton
-          icon={<ChevronLeft className="h-4 w-4" />}
+          icon={<ChevronLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />}
           iconOnLeft={true}
           variant="outline"
+          hideTextOnMobile
         >
           Previous Module
         </IconButton>
 
         <IconButton
-          icon={<ChevronRight className="h-4 w-4" />}
+          icon={<ChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4" />}
           iconOnLeft={false}
           variant="default"
+          hideTextOnMobile
         >
           Next Module
         </IconButton>

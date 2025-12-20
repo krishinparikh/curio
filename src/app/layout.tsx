@@ -33,7 +33,7 @@ export default function RootLayout({
         <Providers>
           <SidebarProvider defaultOpen={false}>
             <AppSidebar />
-            <SidebarInset className="flex flex-col min-h-screen">
+            <SidebarInset className="flex flex-col h-screen overflow-hidden">
               {children}
             </SidebarInset>
           </SidebarProvider>

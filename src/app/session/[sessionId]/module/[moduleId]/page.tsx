@@ -4,7 +4,7 @@ import { ModuleHeader } from "./components/ModuleHeader";
 import { AIPane } from "./components/ai_pane/AIPane";
 import { Content } from "./components/Content";
 import { ModuleFooter } from "./components/ModuleFooter";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
@@ -19,11 +19,22 @@ export default function ModulePage({ params }: ModulePageProps) {
   const { sessionId, moduleId } = use(params);
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
+
+  // Determine initial state based on screen size
   const [isPaneOpen, setIsPaneOpen] = useState(true);
 
+  useEffect(() => {
+    // Set initial state based on screen size (closed on mobile, open on desktop)
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    setIsPaneOpen(!isMobile);
+  }, []);
+
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
-      <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
+    <div className="h-full bg-background flex flex-col overflow-hidden">
+      {/* ModuleHeader: visible on desktop always, visible on mobile only when AI pane is closed */}
+      <div className={`md:block ${isPaneOpen ? 'hidden' : 'block'}`}>
+        <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
+      </div>
 
       {/* Main Content Area - Resizable Panels */}
       <PanelGroup direction="horizontal" className="flex-1 overflow-hidden">

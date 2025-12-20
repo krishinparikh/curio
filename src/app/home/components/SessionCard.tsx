@@ -13,10 +13,12 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
-  const { setOpen } = useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const handleClick = () => {
-    setOpen(false);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (

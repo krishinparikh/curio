@@ -3,6 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatMessage } from "./ChatMessage";
 import { AIPaneInput } from "./AIPaneInput";
+import { AIPaneHeader } from "./AIPaneHeader";
 import FollowUpQuestions from "./FollowUpQuestions";
 import { useRef, useEffect, useMemo } from "react";
 import { useAIChat, useGetMessages, useGetCurrentFollowUps } from "../../hooks";
@@ -77,6 +78,9 @@ export function AIPane({ moduleId, userId, open, onOpenChange }: AIPaneProps) {
       maxSize={70}
       className="bg-card border-l border-border flex flex-col overflow-hidden md:flex fixed md:relative inset-0 md:inset-auto w-full md:w-auto z-50 md:z-auto transition-transform duration-300 ease-in-out animate-in slide-in-from-right md:animate-none"
     >
+      {/* AI Pane Header - Mobile Only */}
+      <AIPaneHeader onClose={() => onOpenChange(false)} />
+
       {/* Chat Messages Area */}
       <div ref={scrollAreaRef} className="flex-1 overflow-y-auto py-4 px-6 space-y-4 scrollbar-hide">
         {getMessagesQuery.isLoading ? (
