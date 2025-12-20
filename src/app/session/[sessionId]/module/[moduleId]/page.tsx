@@ -43,7 +43,7 @@ export default function ModulePage({ params }: ModulePageProps) {
           <div className="h-full flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto scrollbar-hide">
               <Content moduleId={moduleId} isPaneOpen={isPaneOpen} />
-              <ModuleFooter isPaneOpen={isPaneOpen} />
+              <ModuleFooter isPaneOpen={isPaneOpen} sessionId={sessionId} moduleId={moduleId} />
             </div>
           </div>
         </Panel>

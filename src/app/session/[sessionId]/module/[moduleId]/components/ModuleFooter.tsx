@@ -2,15 +2,43 @@
 
 import { IconButton } from '@/components/IconButton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useGetModule } from '../hooks';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface ModuleFooterProps {
   isPaneOpen: boolean;
+  sessionId: string;
+  moduleId: string;
 }
 
-export function ModuleFooter({ isPaneOpen }: ModuleFooterProps) {
+export function ModuleFooter({ isPaneOpen, sessionId, moduleId }: ModuleFooterProps) {
+  const { data: session } = useSession();
+  const userId = session?.user?.id || '';
+  const { data: moduleData } = useGetModule(moduleId, userId);
+  const router = useRouter();
+
   const containerClasses = isPaneOpen
     ? "px-4 w-full max-w-6xl pb-4"
     : "px-4 w-full max-w-6xl mx-auto pb-4";
+
+  // Find current module index and determine prev/next
+  const modules = moduleData?.learningSession?.modules || [];
+  const currentIndex = modules.findIndex(m => m.id === moduleId);
+  const previousModule = currentIndex > 0 ? modules[currentIndex - 1] : null;
+  const nextModule = currentIndex < modules.length - 1 ? modules[currentIndex + 1] : null;
+
+  const handlePrevious = () => {
+    if (previousModule) {
+      router.push(`/session/${sessionId}/module/${previousModule.id}`);
+    }
+  };
+
+  const handleNext = () => {
+    if (nextModule) {
+      router.push(`/session/${sessionId}/module/${nextModule.id}`);
+    }
+  };
 
   return (
     <div className={containerClasses}>
@@ -20,6 +48,8 @@ export function ModuleFooter({ isPaneOpen }: ModuleFooterProps) {
           iconOnLeft={true}
           variant="outline"
           hideTextOnMobile
+          onClick={handlePrevious}
+          disabled={!previousModule}
         >
           Previous Module
         </IconButton>
@@ -29,6 +59,8 @@ export function ModuleFooter({ isPaneOpen }: ModuleFooterProps) {
           iconOnLeft={false}
           variant="default"
           hideTextOnMobile
+          onClick={handleNext}
+          disabled={!nextModule}
         >
           Next Module
         </IconButton>
