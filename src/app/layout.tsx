@@ -3,6 +3,9 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Providers } from "./providers";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
+import { AppSidebar } from "@/components/AppSidebar";
 
 const geist = Geist({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -28,7 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={geist.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SidebarProvider defaultOpen={false}>
+            <AppSidebarProvider>
+              <AppSidebar />
+              <SidebarInset className="flex flex-col h-screen overflow-hidden">
+                {children}
+              </SidebarInset>
+            </AppSidebarProvider>
+          </SidebarProvider>
+        </Providers>
       </body>
     </html>
   )

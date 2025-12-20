@@ -1,14 +1,24 @@
 "use client";
 
-import { ArrowLeft, Bot, Check } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Bot, Check } from "lucide-react";
+import { Header } from "@/components/Header";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { IconButton } from "@/components/IconButton";
 import { useGetModule, useMarkModuleComplete } from "../hooks";
+import { constructModuleName } from "@/lib/utils";
 
 interface ModuleHeaderProps {
   sessionId: string;
@@ -21,19 +31,11 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
   const router = useRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
-
-  // Fetch module data
   const getModuleQuery = useGetModule(moduleId, userId);
+  const isLoading = getModuleQuery.isLoading;
 
   // Mark module complete mutation
   const markModuleCompleteMutation = useMarkModuleComplete(userId);
-
-  // Extract module and session names from fetched data
-  const sessionName = getModuleQuery.data?.learningSession?.name || "";
-  const moduleOrder = getModuleQuery.data?.order;
-  const moduleName = moduleOrder !== undefined
-    ? `${moduleOrder + 1}. ${getModuleQuery.data?.name || ""}`
-    : getModuleQuery.data?.name || "";
   const isModuleComplete = getModuleQuery.data?.isComplete || false;
 
   // Handle complete button click
@@ -48,57 +50,69 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
   };
 
   return (
-    <div className="bg-background flex justify-center border-b">
-      <div className="w-full max-w-4xl px-6">
-        <div className="pt-4 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
-          <div className="flex flex-col items-start">
-            {!sessionName || !moduleName ? (
-              <div className="flex flex-col gap-1">
-                <Skeleton className="h-4 md:h-5 w-32" />
-                <Skeleton className="h-6 md:h-7 w-64" />
-              </div>
-            ) : (
-              <>
-                <p className="text-xs md:text-sm text-muted-foreground">{sessionName}</p>
-                <h1 className="text-lg md:text-2xl font-semibold">{moduleName}</h1>
-              </>
-            )}
-          </div>
-
-          <div className="flex flex-row items-center gap-2 shrink-0">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={() => router.push(`/session/${sessionId}`)} variant="outline" size="icon" className="rounded-lg hover:bg-secondary hover:text-secondary-foreground h-8 w-8 md:h-10 md:w-10">
-                  <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent sideOffset={8}>
-                <p>Back to Course</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={handleComplete} disabled={markModuleCompleteMutation.isPending || isModuleComplete} variant="outline" size="icon" className="rounded-lg hover:bg-secondary hover:text-secondary-foreground h-8 w-8 md:h-10 md:w-10">
-                  {markModuleCompleteMutation.isPending ? <Spinner className="h-4 w-4 md:h-5 md:w-5" /> : <Check className="h-4 w-4 md:h-5 md:w-5" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent sideOffset={8}>
-                <p>Complete Module</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={onTogglePane} variant="outline" size="icon" className="rounded-lg hover:bg-secondary hover:text-secondary-foreground h-8 w-8 md:h-10 md:w-10">
-                  <Bot className="h-4 w-4 md:h-5 md:w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent sideOffset={8}>
-                <p>AI Tutor</p>
-              </TooltipContent>
-            </Tooltip>
+    <Header
+      className="bg-background"
+      content={
+        <div className="flex items-center justify-between w-full gap-1 md:gap-2">
+          <Link href="/home" className="md:hidden flex-shrink-0">
+            <Image src="/CurioIcon.png" alt="Curio" width={200} height={200} priority className="h-7 w-7" />
+          </Link>
+          <Breadcrumb className="flex-1 min-w-0 overflow-hidden">
+            <BreadcrumbList className="flex-nowrap">
+              <BreadcrumbItem className="hidden md:block flex-shrink-0">
+                {isLoading ? (
+                  <Skeleton className="h-5 w-24" />
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={`/session/${sessionId}`}>{getModuleQuery.data?.learningSession?.name}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              <BreadcrumbItem className="md:hidden flex-shrink-0">
+                {isLoading ? (
+                  <Skeleton className="h-5 w-8" />
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={`/session/${sessionId}`}>...</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="flex-shrink-0" />
+              <BreadcrumbItem className="min-w-0">
+                {isLoading ? (
+                  <Skeleton className="h-5 w-32" />
+                ) : (
+                  <BreadcrumbPage className="truncate">
+                    {constructModuleName(getModuleQuery.data?.order || 0, getModuleQuery.data?.name || "")}
+                  </BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            <IconButton
+              icon={<Bot className="h-3.5 w-3.5 md:h-4 md:w-4" />}
+              className={`${isPaneOpen ? "bg-accent hover:bg-accent" : "bg-card hover:bg-card"}`}
+              iconOnLeft={true}
+              variant="outline"
+              onClick={onTogglePane}
+              hideTextOnMobile
+            >
+              AI Tutor
+            </IconButton>
+            <IconButton
+              icon={markModuleCompleteMutation.isPending ? <Spinner className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <Check className="h-3.5 w-3.5 md:h-4 md:w-4" />}
+              iconOnLeft={true}
+              variant="default"
+              onClick={handleComplete}
+              disabled={markModuleCompleteMutation.isPending || isModuleComplete}
+              hideTextOnMobile
+            >
+              Mark Complete
+            </IconButton>
           </div>
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }

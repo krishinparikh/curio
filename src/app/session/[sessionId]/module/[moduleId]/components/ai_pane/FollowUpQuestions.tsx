@@ -31,7 +31,7 @@ export default function FollowUpQuestions({
             Array.from({ length: 3 }).map((_, index) => (
               <TableRow
                 key={`skeleton-${index}`}
-                className={cn(index === 0 && "border-t")}
+                className={cn(index === 0 && "border-t border-border")}
               >
                 <TableCell className="py-3">
                   <Skeleton className="h-4 w-full" />
@@ -45,7 +45,7 @@ export default function FollowUpQuestions({
                 key={index}
                 className={cn(
                   "cursor-pointer hover:bg-muted/50 transition-colors",
-                  index === 0 && "border-t"
+                  index === 0 && "border-t border-border"
                 )}
                 onClick={() => onQuestionClick?.(question)}
               >

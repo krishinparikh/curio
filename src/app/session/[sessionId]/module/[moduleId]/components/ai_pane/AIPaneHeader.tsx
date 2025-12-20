@@ -1,7 +1,8 @@
 "use client";
 
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Header } from "@/components/Header";
+import { IconButton } from "@/components/IconButton";
 
 interface AIPaneHeaderProps {
   onClose: () => void;
@@ -9,17 +10,19 @@ interface AIPaneHeaderProps {
 
 export function AIPaneHeader({ onClose }: AIPaneHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-6 py-1 border-b">
-      <h2 className="text-sm font-semibold">AI Tutor</h2>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 rounded-sm hover:bg-secondary hover:text-secondary-foreground"
-        onClick={onClose}
-      >
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </Button>
-    </div>
+    <Header
+      className="bg-background md:hidden"
+      content={
+        <div className="flex items-center justify-between w-full gap-1">
+          <h1 className="text-sm font-normal">AI Tutor</h1>
+          <IconButton
+            icon={<X className="h-4 w-4" />}
+            variant="ghost"
+            onClick={onClose}
+            className="h-9 w-9"
+          />
+        </div>
+      }
+    />
   );
 }

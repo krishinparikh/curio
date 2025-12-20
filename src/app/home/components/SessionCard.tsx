@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useAppSidebar } from "@/contexts/AppSidebarContext";
 
 interface SessionCardProps {
   id: string;
@@ -11,20 +13,31 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
+  const { isMobile, setOpen, setOpenMobile } = useAppSidebar();
+
+  const handleClick = () => {
+    if (isMobile) {
+      // Mobile: close the sheet
+      setOpenMobile(false);
+    } else {
+      // Desktop: collapse to icon mode
+      setOpen(false);
+    }
+  };
+
   return (
-    <Link href={`/session/${id}`} className="block">
-      <Card className="w-full hover:shadow-md transition-shadow cursor-pointer">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-foreground">{title}</h3>
-            <span className="text-lg font-semibold">{progress}%</span>
-          </div>
-          <Progress value={progress} className="mt-3 h-2" />
-          <p className="text-sm text-muted-foreground mt-2">
-            {modulesCompleted}/{totalModules} Modules Completed
-          </p>
-        </CardContent>
-      </Card>
+    <Link
+      href={`/session/${id}`}
+      onClick={handleClick}
+      className="flex flex-col items-start p-6 hover:bg-sidebar-accent transition-colors group-data-[collapsible=icon]:hidden"
+    >
+      <span className="text-base mb-2 truncate w-full">{title}</span>
+      <div className="w-full space-y-2">
+        <Progress value={progress} className="h-1.5 bg-sidebar-border" />
+        <p className="text-xs text-muted-foreground">
+          {modulesCompleted}/{totalModules} modules completed
+        </p>
+      </div>
     </Link>
   );
 }

@@ -6,48 +6,47 @@ import MarkdownRenderer from '@/app/MarkdownRenderer';
 
 interface ContentProps {
   moduleId: string;
+  isPaneOpen: boolean;
 }
 
-export function Content({ moduleId }: ContentProps) {
+export function Content({ moduleId, isPaneOpen }: ContentProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
 
   const getModuleQuery = useGetModule(moduleId, userId);
 
+  const containerClasses = isPaneOpen
+    ? "p-4 w-full max-w-6xl"
+    : "p-4 w-full max-w-6xl mx-auto";
+
   if (getModuleQuery.isLoading) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-muted-foreground text-center">Loading module content...</p>
-        </div>
+      <div className={containerClasses}>
+        <p className="text-muted-foreground text-center">Loading module content...</p>
       </div>
     );
   }
 
   if (getModuleQuery.error) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-destructive text-center">Error loading module content</p>
-        </div>
+      <div className={containerClasses}>
+        <p className="text-destructive text-center">Error loading module content</p>
       </div>
     );
   }
 
   if (!getModuleQuery.data) {
     return (
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <p className="text-muted-foreground text-center">Module not found</p>
-        </div>
+      <div className={containerClasses}>
+        <p className="text-muted-foreground text-center">Module not found</p>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-4xl px-6 py-8">
-        <div className="prose prose-base dark:prose-invert max-w-none">
+    <div className={containerClasses}>
+      <div className="bg-card rounded p-4 md:p-10 shadow">
+        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
           <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
         </div>
       </div>
