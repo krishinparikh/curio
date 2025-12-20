@@ -1,7 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
+import { SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 
 interface SessionCardProps {
   id: string;
@@ -12,17 +13,25 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
+  const { setOpen } = useSidebar();
+
+  const handleClick = () => {
+    setOpen(false);
+  };
+
   return (
-    <Link href={`/session/${id}`} className="block group">
-      <div className="px-4 py-4 border border-sidebar-border rounded hover:bg-sidebar-accent hover:border-sidebar-accent-foreground/20 transition-all duration-200">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-sidebar-foreground group-hover:text-sidebar-accent-foreground truncate">{title}</h3>
-        </div>
-        <Progress value={progress} className="h-1.5 mb-2 bg-sidebar-border" />
-        <p className="text-xs text-muted-foreground">
-          {modulesCompleted}/{totalModules} modules completed
-        </p>
-      </div>
-    </Link>
+    <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
+      <SidebarMenuButton asChild>
+        <Link href={`/session/${id}`} onClick={handleClick} className="flex flex-col items-start gap-1 h-auto py-4">
+          <span className="text-base truncate w-full">{title}</span>
+          <div className="w-full space-y-1">
+            <Progress value={progress} className="h-1.5 bg-sidebar-border" />
+            <p className="text-xs text-muted-foreground">
+              {modulesCompleted}/{totalModules} modules completed
+            </p>
+          </div>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }

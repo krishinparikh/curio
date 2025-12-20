@@ -9,8 +9,8 @@ interface ModuleFooterProps {
 
 export function ModuleFooter({ isPaneOpen }: ModuleFooterProps) {
   const containerClasses = isPaneOpen
-    ? "px-4 w-full max-w-6xl pb-7"
-    : "px-4 w-full max-w-6xl mx-auto pb-7";
+    ? "px-4 w-full max-w-6xl pb-4"
+    : "px-4 w-full max-w-6xl mx-auto pb-4";
 
   return (
     <div className={containerClasses}>

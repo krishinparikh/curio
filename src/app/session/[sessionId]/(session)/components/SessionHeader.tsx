@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { Header } from "@/components/Header";
 import {
   Breadcrumb,
@@ -49,11 +47,8 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
   return (
     <>
       <Header
-        mainContent={
-          <>
-            <Link href="/home" className="hover:opacity-80 transition-opacity">
-              <Image src="/CurioIcon.png" alt="Curio" width={32} height={32} className="h-6 w-6" />
-            </Link>
+        content={
+          <div className="flex items-center justify-between w-full">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -65,25 +60,23 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </>
-        }
-        rightActions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Session
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Session
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
 

@@ -41,7 +41,7 @@ export function AIPaneInput({ onSendMessage, isStreaming }: AIPaneInputProps) {
   };
 
   return (
-    <div className="pb-7 px-7">
+    <div className="pb-4 px-4">
       <InputGroup className="min-h-[60px]">
         <InputGroupTextarea
           value={inputValue}

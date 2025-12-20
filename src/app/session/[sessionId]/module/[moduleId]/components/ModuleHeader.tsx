@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Bot, Check } from "lucide-react";
@@ -50,12 +49,9 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
 
   return (
     <Header
-      className="bg-background shadow"
-      mainContent={
-        <>
-          <Link href="/home" className="hover:opacity-80 transition-opacity">
-            <Image src="/CurioIcon.png" alt="Curio" width={32} height={32} className="h-6 w-6" />
-          </Link>
+      className="bg-background"
+      content={
+        <div className="flex items-center justify-between w-full">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -77,28 +73,26 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-        </>
-      }
-      rightActions={
-        <>
-          <IconButton
-            icon={<Bot className="h-4 w-4" />}
-            iconOnLeft={true}
-            variant="outline"
-            onClick={onTogglePane}
-          >
-            AI Tutor
-          </IconButton>
-          <IconButton
-            icon={markModuleCompleteMutation.isPending ? <Spinner className="h-4 w-4" /> : <Check className="h-4 w-4" />}
-            iconOnLeft={true}
-            variant="default"
-            onClick={handleComplete}
-            disabled={markModuleCompleteMutation.isPending || isModuleComplete}
-          >
-            Mark Complete
-          </IconButton>
-        </>
+          <div className="flex items-center gap-2">
+            <IconButton
+              icon={<Bot className="h-4 w-4" />}
+              iconOnLeft={true}
+              variant="outline"
+              onClick={onTogglePane}
+            >
+              AI Tutor
+            </IconButton>
+            <IconButton
+              icon={markModuleCompleteMutation.isPending ? <Spinner className="h-4 w-4" /> : <Check className="h-4 w-4" />}
+              iconOnLeft={true}
+              variant="default"
+              onClick={handleComplete}
+              disabled={markModuleCompleteMutation.isPending || isModuleComplete}
+            >
+              Mark Complete
+            </IconButton>
+          </div>
+        </div>
       }
     />
   );

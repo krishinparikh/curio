@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cut off the top of the sidebar border to blend with header */
+  .sidebar-rail-cutoff::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: calc(3.5rem - 1px);
+    background: var(--card);
+    z-index: 30;
+  }
+}
+
 @layer base {
   .theme {
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -40,13 +63,13 @@
     --chart-4: oklch(0.4900 0.2200 264);
     --chart-5: oklch(0.4200 0.1800 266);
     --radius: 0.625rem;
-    --sidebar: oklch(0.9850 0 0);
+    --sidebar: oklch(1 0 0);
     --sidebar-foreground: oklch(0.1450 0 0);
     --sidebar-primary: oklch(0.2050 0 0);
     --sidebar-primary-foreground: oklch(0.9850 0 0);
-    --sidebar-accent: oklch(0.9700 0 0);
+    --sidebar-accent: oklch(0.9637 0.0017 247.8394);
     --sidebar-accent-foreground: oklch(0.2050 0 0);
-    --sidebar-border: oklch(0.9220 0 0);
+    --sidebar-border: oklch(0.9260 0.0035 219.5344);
     --sidebar-ring: oklch(0.7080 0 0);
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;

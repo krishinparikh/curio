@@ -48,10 +48,8 @@ export default function SessionPage({ params }: SessionPageProps) {
   // Show loading while auth session or query is loading
   if (sessionStatus === 'loading' || getSessionQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="flex-1 flex items-center justify-center">
-          <Spinner className="size-12" />
-        </div>
+      <div className="h-full flex items-center justify-center">
+        <Spinner className="size-12" />
       </div>
     );
   }
@@ -63,8 +61,8 @@ export default function SessionPage({ params }: SessionPageProps) {
   const { session, totalModules, completedModules, inferredLength } = sessionData;
 
   return (
-    <div className="min-h-screen">
-      <div className="py-4">
+    <div className="h-full overflow-auto scrollbar-hide">
+      <div className="p-4 w-full mx-auto">
         <SessionTitleSection
           sessionName={session.name}
           completedModules={completedModules}

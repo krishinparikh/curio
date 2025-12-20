@@ -3,15 +3,13 @@
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { HomeHeader } from "./components/HomeHeader";
-import { HomeSidebar } from "./components/HomeSidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useGetSessions, useCreateSession } from "./hooks";
+import { useCreateSession } from "./hooks";
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -19,7 +17,6 @@ export default function HomePage() {
   const userId = session?.user?.id || "";
 
   const getUserQuery = useGetUser(userId);
-  const getSessionsQuery = useGetSessions(userId);
   const createSessionMutation = useCreateSession();
 
   const firstName = useMemo(() => {
@@ -34,24 +31,6 @@ export default function HomePage() {
 
     return null;
   }, [getUserQuery.data]);
-
-  const sessionData = useMemo(() => {
-    if (!getSessionsQuery.data) return [];
-
-    return getSessionsQuery.data.map(session => {
-      const totalModules = session.modules.length;
-      const modulesCompleted = session.modules.filter(m => m.isComplete).length;
-      const progress = totalModules > 0 ? Math.round((modulesCompleted / totalModules) * 100) : 0;
-
-      return {
-        id: session.id,
-        title: session.name,
-        progress,
-        modulesCompleted,
-        totalModules,
-      };
-    });
-  }, [getSessionsQuery.data]);
 
   const [topic, setTopic] = useState("");
   const [length, setLength] = useState<"short" | "medium" | "long">("short");
@@ -73,26 +52,18 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <SidebarProvider defaultOpen={false}>
-        <HomeSidebar sessionData={[]} isLoading={true} />
-        <SidebarInset>
-          <div className="h-screen bg-background flex flex-col overflow-hidden">
-            <HomeHeader />
-            <div className="flex-1 flex items-center justify-center">
-              <Spinner className="size-12 text-primary" />
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="h-screen bg-background flex flex-col overflow-hidden">
+        <HomeHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <Spinner className="size-12 text-primary" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <HomeSidebar sessionData={sessionData} isLoading={getSessionsQuery.isLoading} />
-      <SidebarInset>
-        <div className="h-screen bg-background flex flex-col overflow-hidden">
-          <HomeHeader />
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <HomeHeader />
 
           {/* Loading Overlay for Session Creation */}
           {isCreatingSession && (
@@ -104,9 +75,9 @@ export default function HomePage() {
             </div>
           )}
 
-          <main className="flex-1 flex justify-center px-4 sm:px-6 pt-16 sm:pt-24">
+          <main className="flex-1 flex justify-center px-4 sm:px-6 pt-16 sm:pt-36">
             <div className="w-full max-w-3xl flex flex-col items-center space-y-10 sm:space-y-8 md:space-y-10">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-foreground max-w-2xl px-4">
+              <h1 className="text-3xl sm:text-4xl md:text-4xl font-medium text-center text-foreground max-w-4xl px-4">
                 {firstName ? `What do you want to learn today, ${firstName}?` : "What do you want to learn today?"}
               </h1>
 
@@ -168,8 +139,6 @@ export default function HomePage() {
               </Button>
             </div>
           </main>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    </div>
   );
 }

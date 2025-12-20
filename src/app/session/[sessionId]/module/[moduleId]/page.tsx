@@ -22,7 +22,7 @@ export default function ModulePage({ params }: ModulePageProps) {
   const [isPaneOpen, setIsPaneOpen] = useState(true);
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
 
       {/* Main Content Area - Resizable Panels */}
