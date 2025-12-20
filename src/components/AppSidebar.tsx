@@ -12,7 +12,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarMenu,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SearchInput } from "@/app/home/components/SearchInput";
@@ -60,21 +59,21 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="p-0">
+      <SidebarHeader className="p-0 gap-0">
         <div className="h-14 flex items-center px-4 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
           <Link href="/home" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Image src="/CurioLogo.png" alt="Curio" width={600} height={200} priority className="h-8 w-auto group-data-[collapsible=icon]:hidden" />
             <Image src="/CurioIcon.png" alt="Curio" width={200} height={200} priority className="h-8 w-8 hidden group-data-[collapsible=icon]:block" />
           </Link>
         </div>
-        <div className="px-4 pb-3 group-data-[collapsible=icon]:hidden">
+        <div className="px-4 group-data-[collapsible=icon]:hidden">
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
       </SidebarHeader>
       <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <div className="px-4 group-data-[collapsible=icon]:px-0">
               {getSessionsQuery.isLoading ? (
                 <p className="text-muted-foreground text-center py-8 group-data-[collapsible=icon]:hidden">Loading sessions...</p>
               ) : filteredSessions.length === 0 ? (
@@ -82,22 +81,24 @@ export function AppSidebar() {
                   {searchQuery.trim() ? "No sessions found." : "No learning sessions yet. Create one to get started!"}
                 </p>
               ) : (
-                filteredSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    id={session.id}
-                    title={session.title}
-                    progress={session.progress}
-                    modulesCompleted={session.modulesCompleted}
-                    totalModules={session.totalModules}
-                  />
+                filteredSessions.map((session, index) => (
+                  <div key={session.id}>
+                    {index > 0 && <div className="border-t border-sidebar-border group-data-[collapsible=icon]:hidden" />}
+                    <SessionCard
+                      id={session.id}
+                      title={session.title}
+                      progress={session.progress}
+                      modulesCompleted={session.modulesCompleted}
+                      totalModules={session.totalModules}
+                    />
+                  </div>
                 ))
               )}
-            </SidebarMenu>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border">
+      <SidebarFooter className="border-sidebar-border px-4 py-2 gap-0">
         <NavUser />
       </SidebarFooter>
       <SidebarRail className={shouldBlendBorder ? "sidebar-rail-cutoff" : ""} />

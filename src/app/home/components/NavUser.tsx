@@ -15,8 +15,8 @@ export function NavUser() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg">
-            <Skeleton className="h-10 w-10 rounded" />
+          <SidebarMenuButton size="lg" className="!py-3">
+            <Skeleton className="h-10 w-10 rounded shrink-0" />
             <div className="flex flex-col gap-1 group-data-[collapsible=icon]:hidden">
               <Skeleton className="h-3.5 w-24" />
               <Skeleton className="h-3 w-16" />
@@ -32,8 +32,8 @@ export function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild size="lg" tooltip={userName}>
-          <Link href="/profile" className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
+        <SidebarMenuButton asChild size="lg" tooltip={userName} className="!py-3">
+          <Link href="/profile">
             {session?.user?.image ? (
               <Image
                 src={session.user.image}

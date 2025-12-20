@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
-import { SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface SessionCardProps {
   id: string;
@@ -20,18 +20,18 @@ export function SessionCard({ id, title, progress, modulesCompleted, totalModule
   };
 
   return (
-    <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
-      <SidebarMenuButton asChild>
-        <Link href={`/session/${id}`} onClick={handleClick} className="flex flex-col items-start gap-1 h-auto py-4">
-          <span className="text-base truncate w-full">{title}</span>
-          <div className="w-full space-y-1">
-            <Progress value={progress} className="h-1.5 bg-sidebar-border" />
-            <p className="text-xs text-muted-foreground">
-              {modulesCompleted}/{totalModules} modules completed
-            </p>
-          </div>
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
+    <Link
+      href={`/session/${id}`}
+      onClick={handleClick}
+      className="flex flex-col items-start p-6 hover:bg-sidebar-accent transition-colors group-data-[collapsible=icon]:hidden"
+    >
+      <span className="text-base mb-2 truncate w-full">{title}</span>
+      <div className="w-full space-y-2">
+        <Progress value={progress} className="h-1.5 bg-sidebar-border" />
+        <p className="text-xs text-muted-foreground">
+          {modulesCompleted}/{totalModules} modules completed
+        </p>
+      </div>
+    </Link>
   );
 }
