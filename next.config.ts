@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
     // Enable faster builds with custom server
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;
