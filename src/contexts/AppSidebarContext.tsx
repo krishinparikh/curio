@@ -38,7 +38,8 @@ export function AppSidebarProvider({ children }: { children: ReactNode }) {
         router.push(href);
       }, 100);
     } else {
-      // Desktop: navigate immediately
+      // Desktop: close sidebar and navigate
+      sidebar.setOpen(false);
       router.push(href);
     }
   }, [sidebar, router]);

@@ -19,7 +19,7 @@ import { SessionCard } from "@/app/home/components/SessionCard";
 import { NavUser } from "@/app/home/components/NavUser";
 import { useGetSessions } from "@/app/home/hooks";
 
-const bgBlendPages = ["/session", "/module"];
+const bgBlendPages = ["/session", "/module", "/profile"];
 
 export function AppSidebar() {
   const { data: session } = useSession();

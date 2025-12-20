@@ -1,11 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useSession } from "next-auth/react";
-import { User } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { User, LogOut, UserCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { useAppSidebar } from "@/contexts/AppSidebarContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function NavUser() {
   const { data: session, status: sessionStatus } = useSession();
@@ -30,34 +37,55 @@ export function NavUser() {
 
   const userName = session?.user?.name ?? session?.user?.email ?? "User";
 
+  const handleProfileClick = () => {
+    navigateAndClose("/profile");
+  };
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/", redirect: true });
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild size="lg" tooltip={userName} className="!py-3">
-          <button onClick={() => navigateAndClose("/profile")} className="w-full">
-            {session?.user?.image ? (
-              <Image
-                src={session.user.image}
-                alt={userName}
-                width={40}
-                height={40}
-                className="h-10 w-10 rounded object-cover border border-sidebar-border shrink-0"
-              />
-            ) : (
-              <div className="h-10 w-10 rounded bg-sidebar-accent border border-sidebar-border flex items-center justify-center shrink-0">
-                <User className="h-5 w-5 text-muted-foreground" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton size="lg" className="!py-3">
+              {session?.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={userName}
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded object-cover border border-sidebar-border shrink-0"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded bg-sidebar-accent border border-sidebar-border flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex flex-col gap-0.5 group-data-[collapsible=icon]:hidden">
+                <span className="text-sm font-medium text-sidebar-foreground">
+                  {userName}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Free Plan
+                </span>
               </div>
-            )}
-            <div className="flex flex-col gap-0.5 group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium text-sidebar-foreground">
-                {userName}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Free Plan
-              </span>
-            </div>
-          </button>
-        </SidebarMenuButton>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="right" align="end" className="w-56">
+            <DropdownMenuItem onSelect={handleProfileClick}>
+              <UserCircle className="mr-2 h-4 w-4" />
+              My Profile
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
   );
