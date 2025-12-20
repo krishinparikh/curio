@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { useAppSidebar } from "@/contexts/AppSidebarContext";
 
 export function NavUser() {
   const { data: session, status: sessionStatus } = useSession();
+  const { navigateAndClose } = useAppSidebar();
   const isLoading = sessionStatus === "loading";
 
   if (isLoading) {
@@ -33,7 +34,7 @@ export function NavUser() {
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton asChild size="lg" tooltip={userName} className="!py-3">
-          <Link href="/profile">
+          <button onClick={() => navigateAndClose("/profile")} className="w-full">
             {session?.user?.image ? (
               <Image
                 src={session.user.image}
@@ -55,7 +56,7 @@ export function NavUser() {
                 Free Plan
               </span>
             </div>
-          </Link>
+          </button>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

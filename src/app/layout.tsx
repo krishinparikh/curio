@@ -4,6 +4,7 @@ import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Providers } from "./providers";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
 import { AppSidebar } from "@/components/AppSidebar";
 
 const geist = Geist({
@@ -32,10 +33,12 @@ export default function RootLayout({
       <body className={geist.className}>
         <Providers>
           <SidebarProvider defaultOpen={false}>
-            <AppSidebar />
-            <SidebarInset className="flex flex-col h-screen overflow-hidden">
-              {children}
-            </SidebarInset>
+            <AppSidebarProvider>
+              <AppSidebar />
+              <SidebarInset className="flex flex-col h-screen overflow-hidden">
+                {children}
+              </SidebarInset>
+            </AppSidebarProvider>
           </SidebarProvider>
         </Providers>
       </body>

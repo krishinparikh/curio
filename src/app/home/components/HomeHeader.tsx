@@ -3,10 +3,10 @@
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useAppSidebar } from "@/contexts/AppSidebarContext";
 
 export function HomeHeader() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useAppSidebar();
 
   return (
     <Header

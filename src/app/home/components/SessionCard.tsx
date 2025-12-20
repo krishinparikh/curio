@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useAppSidebar } from "@/contexts/AppSidebarContext";
 
 interface SessionCardProps {
   id: string;
@@ -13,11 +13,15 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
-  const { setOpenMobile, isMobile } = useSidebar();
+  const { isMobile, setOpen, setOpenMobile } = useAppSidebar();
 
   const handleClick = () => {
     if (isMobile) {
+      // Mobile: close the sheet
       setOpenMobile(false);
+    } else {
+      // Desktop: collapse to icon mode
+      setOpen(false);
     }
   };
 

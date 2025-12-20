@@ -141,7 +141,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header content={<></>} />
       <div className="container mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Edit Button - Outside Card */}
         <div className="mb-4 flex items-center justify-end">
