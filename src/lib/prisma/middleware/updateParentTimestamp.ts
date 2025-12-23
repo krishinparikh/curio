@@ -36,7 +36,7 @@ export const updateParentTimestampExtension = Prisma.defineExtension((client) =>
           if (courseId && typeof courseId === 'string') {
             await client.course.update({
               where: { id: courseId },
-              data: { lastUpdated: new Date() }
+              data: { lastActive: new Date() }
             });
           }
 

@@ -46,7 +46,7 @@ async function testChatService() {
     // Get a sample module from the database with user info
     const sampleModule = await prisma.module.findFirst({
       include: {
-        learningSession: {
+        course: {
           select: {
             name: true,
             userId: true,
@@ -61,11 +61,11 @@ async function testChatService() {
     }
 
     const moduleId = sampleModule.id;
-    const userId = sampleModule.learningSession.userId;
+    const userId = sampleModule.course.userId;
     console.log(`Using module ID: ${moduleId}`);
     console.log(`Using user ID: ${userId}`);
     console.log(`Module: ${sampleModule.name}`);
-    console.log(`Session: ${sampleModule.learningSession.name}\n`);
+    console.log(`Course: ${sampleModule.course.name}\n`);
 
     // Test 1: getMessages() - Get existing messages
     console.log('TEST 1: getMessages() - Retrieve Existing Messages');
@@ -146,10 +146,10 @@ async function testChatService() {
     if (!testUser) {
       console.log('WARNING: No users found for limit test');
     } else {
-      const limitTestSession = await prisma.learningSession.create({
+      const limitTestCourse = await prisma.course.create({
         data: {
           userId: testUser.id,
-          name: 'Message Limit Test Session',
+          name: 'Message Limit Test Course',
           description: 'Testing message limits',
           originalPrompt: 'Test',
           modules: {
@@ -166,7 +166,7 @@ async function testChatService() {
         },
       });
 
-      const limitTestModuleId = limitTestSession.modules[0].id;
+      const limitTestModuleId = limitTestCourse.modules[0].id;
 
       // Add 100 messages to reach the limit
       console.log('Adding 100 messages to reach the limit...');
@@ -205,15 +205,15 @@ async function testChatService() {
         });
       }
 
-      // Clean up test session
-      console.log('\nCleaning up test session...');
+      // Clean up test course
+      console.log('\nCleaning up test course...');
       await prisma.module.delete({
         where: { id: limitTestModuleId },
       });
-      await prisma.learningSession.delete({
-        where: { id: limitTestSession.id },
+      await prisma.course.delete({
+        where: { id: limitTestCourse.id },
       });
-      console.log('Test session cleaned up');
+      console.log('Test course cleaned up');
     }
 
     console.log('\n' + '='.repeat(60));

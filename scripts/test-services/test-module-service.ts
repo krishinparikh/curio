@@ -32,8 +32,8 @@ async function testModuleService() {
   console.log('Testing Module Service Methods\n');
 
   try {
-    // Get a sample session from the database with user info
-    const sampleSession = await prisma.learningSession.findFirst({
+    // Get a sample course from the database with user info
+    const sampleCourse = await prisma.course.findFirst({
       include: {
         modules: {
           orderBy: { order: 'asc' },
@@ -41,30 +41,30 @@ async function testModuleService() {
       },
     });
 
-    if (!sampleSession || sampleSession.modules.length === 0) {
-      console.log('WARNING: No sessions with modules found in database. Please run: npm run seed');
+    if (!sampleCourse || sampleCourse.modules.length === 0) {
+      console.log('WARNING: No courses with modules found in database. Please run: npm run seed');
       return;
     }
 
-    const sessionId = sampleSession.id;
-    const userId = sampleSession.userId;
-    const moduleId = sampleSession.modules[0].id;
+    const courseId = sampleCourse.id;
+    const userId = sampleCourse.userId;
+    const moduleId = sampleCourse.modules[0].id;
 
-    console.log(`Using session ID: ${sessionId}`);
+    console.log(`Using course ID: ${courseId}`);
     console.log(`Using user ID: ${userId}`);
     console.log(`Using module ID: ${moduleId}\n`);
 
-    // Test 1: getModules() - Get all modules for a session
-    console.log('TEST 1: getModules() - Get All Modules for Session');
-    console.log('Input:', { sessionId, userId });
-    const modules = await getModules(sessionId, userId);
+    // Test 1: getModules() - Get all modules for a course
+    console.log('TEST 1: getModules() - Get All Modules for Course');
+    console.log('Input:', { courseId, userId });
+    const modules = await getModules(courseId, userId);
     printResult(`Output - Found ${modules.length} Modules`, modules);
 
-    // Test 2: getModuleById() - Get specific module with session context
+    // Test 2: getModuleById() - Get specific module with course context
     console.log('\nTEST 2: getModuleById() - Get Specific Module Details');
     console.log('Input:', { moduleId, userId });
     const moduleDetails = await getModuleById(moduleId, userId);
-    printResult('Output - Module with Learning Session Context', moduleDetails);
+    printResult('Output - Module with Course Context', moduleDetails);
 
     // Test 3: getModuleTitle() - Get module title
     console.log('\nTEST 3: getModuleTitle() - Get Module Title');
@@ -73,7 +73,7 @@ async function testModuleService() {
     printResult('Output - Module Title', { title: moduleTitle });
 
     // Test 4: markModuleComplete() - Mark first incomplete module as complete
-    const incompleteModule = sampleSession.modules.find((m) => !m.isComplete);
+    const incompleteModule = sampleCourse.modules.find((m) => !m.isComplete);
 
     if (incompleteModule) {
       console.log('\nTEST 4: markModuleComplete() - Mark Module as Complete');
@@ -83,36 +83,36 @@ async function testModuleService() {
         moduleId: result.module.id,
         moduleName: result.module.name,
         isComplete: result.module.isComplete,
-        sessionComplete: result.sessionComplete,
-        totalModulesInSession: result.module.learningSession.modules.length,
-        completedModules: result.module.learningSession.modules.filter((m) => m.isComplete).length,
+        courseComplete: result.courseComplete,
+        totalModulesInCourse: result.module.course.modules.length,
+        completedModules: result.module.course.modules.filter((m) => m.isComplete).length,
       });
     } else {
       console.log('\nWARNING: TEST 4 SKIPPED: All modules are already complete');
     }
 
-    // Test 5: markModuleComplete() - Complete all modules to trigger session completion
-    console.log('\nTEST 5: markModuleComplete() - Test Session Completion Detection');
+    // Test 5: markModuleComplete() - Complete all modules to trigger course completion
+    console.log('\nTEST 5: markModuleComplete() - Test Course Completion Detection');
     console.log('Marking all remaining modules as complete...');
 
-    const allModules = await getModules(sessionId, userId);
-    let sessionCompleteResult = null;
+    const allModules = await getModules(courseId, userId);
+    let courseCompleteResult = null;
 
     for (const module of allModules) {
       if (!module.isComplete) {
         console.log(`  Completing: ${module.name}`);
-        sessionCompleteResult = await markModuleComplete(module.id, userId);
+        courseCompleteResult = await markModuleComplete(module.id, userId);
       }
     }
 
-    if (sessionCompleteResult) {
+    if (courseCompleteResult) {
       printResult('Output - Final Module Completion Result', {
-        allModulesComplete: sessionCompleteResult.sessionComplete,
-        lastModuleName: sessionCompleteResult.module.name,
-        totalModules: sessionCompleteResult.module.learningSession.modules.length,
-        message: sessionCompleteResult.sessionComplete
-          ? 'Session completed! All modules are done.'
-          : 'Session still has incomplete modules',
+        allModulesComplete: courseCompleteResult.courseComplete,
+        lastModuleName: courseCompleteResult.module.name,
+        totalModules: courseCompleteResult.module.course.modules.length,
+        message: courseCompleteResult.courseComplete
+          ? 'Course completed! All modules are done.'
+          : 'Course still has incomplete modules',
       });
     } else {
       console.log('  INFO: All modules were already complete');
