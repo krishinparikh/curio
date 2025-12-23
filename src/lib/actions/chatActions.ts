@@ -3,7 +3,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma/db';
 import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/prompts';
+import { getPrompt } from '@/lib/old_prompts';
 import { Message } from '@/lib/ai/types';
 import { getModuleById } from './moduleActions';
 import { getUserData } from './userActions';

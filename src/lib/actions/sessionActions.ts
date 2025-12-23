@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma/db';
 import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/prompts';
+import { getPrompt } from '@/lib/old_prompts';
 
 const openai = new OpenAIProvider('gpt-4o-mini');
 

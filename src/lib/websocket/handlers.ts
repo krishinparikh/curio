@@ -3,7 +3,7 @@ import { OpenAIProvider } from '@/lib/ai/providers/openai';
 import { addMessage, getMessages } from '@/lib/actions/chatActions';
 import { getModuleById } from '@/lib/actions/moduleActions';
 import { getUserData } from '@/lib/actions/userActions';
-import { getPrompt } from '@/lib/prompts';
+import { getPrompt } from '@/lib/old_prompts';
 import { Message } from '@/lib/ai/types';
 
 export interface AIChatGenerationData {
