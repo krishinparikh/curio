@@ -13,43 +13,44 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
   @@map("account")
 }
 
-model LearningSession {
-  id             String   @id @default(uuid()) @map("learning_session_id") @db.Uuid
+model Course {
+  id             String   @id @default(uuid()) @map("course_id") @db.Uuid
   userId         String   @map("user_id") @db.Uuid
   name           String
   description    String
   originalPrompt String?  @map("original_prompt")
-  lastUpdated    DateTime @default(now()) @map("last_updated")
+  lastActive     DateTime @default(now()) @map("last_active")
   user           User     @relation(fields: [userId], references: [id])
   modules        Module[]
 
-  @@map("learning_session")
+  @@map("course")
 }
 
 model Module {
-  id                String          @id @default(uuid()) @map("module_id") @db.Uuid
-  learningSessionId String          @map("learning_session_id") @db.Uuid
-  name              String
-  overview          String
-  order             Int
-  isComplete        Boolean         @default(false) @map("is_complete")
-  messages          Json            @default("[]")
-  content           String          @default("")
-  currentFollowUps  Json            @default("[]")
-  learningSession   LearningSession @relation(fields: [learningSessionId], references: [id], onDelete: Cascade)
+  id               String  @id @default(uuid()) @map("module_id") @db.Uuid
+  courseId         String  @map("course_id") @db.Uuid
+  name             String
+  overview         String
+  order            Int
+  isComplete       Boolean @default(false) @map("is_complete")
+  messages         Json    @default("[]")
+  content          String  @default("")
+  currentFollowUps Json    @default("[]")
+  course           Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@map("module")
 }
@@ -61,19 +62,20 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("session")
 }
 
 model User {
-  id               String            @id @default(uuid()) @map("user_id") @db.Uuid
-  email            String            @unique
-  emailVerified    DateTime?         @map("email_verified")
-  bio              String?
-  image            String?
-  name             String?
-  accounts         Account[]
-  learningSessions LearningSession[]
-  sessions         Session[]
+  id            String    @id @default(uuid()) @map("user_id") @db.Uuid
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  bio           String?
+  image         String?
+  name          String?
+  accounts      Account[]
+  courses       Course[]
+  sessions      Session[]
 
   @@map("user")
 }

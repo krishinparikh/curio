@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { useAppSidebar } from "@/contexts/AppSidebarContext";
 
-interface SessionCardProps {
+interface CourseCardProps {
   id: string;
   title: string;
   progress: number;
@@ -12,7 +12,7 @@ interface SessionCardProps {
   totalModules: number;
 }
 
-export function SessionCard({ id, title, progress, modulesCompleted, totalModules }: SessionCardProps) {
+export function CourseCard({ id, title, progress, modulesCompleted, totalModules }: CourseCardProps) {
   const { isMobile, setOpen, setOpenMobile } = useAppSidebar();
 
   const handleClick = () => {
@@ -27,7 +27,7 @@ export function SessionCard({ id, title, progress, modulesCompleted, totalModule
 
   return (
     <Link
-      href={`/session/${id}`}
+      href={`/course/${id}`}
       onClick={handleClick}
       className="flex flex-col items-start p-6 hover:bg-sidebar-accent transition-colors group-data-[collapsible=icon]:hidden"
     >

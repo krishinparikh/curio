@@ -212,10 +212,10 @@ export function useMarkModuleComplete(userId: string) {
       queryClient.invalidateQueries({ queryKey: ['module', moduleId] });
 
       // Invalidate modules query to refresh the list
-      if (data.module.learningSessionId) {
-        queryClient.invalidateQueries({ queryKey: ['modules', data.module.learningSessionId] });
-        // Invalidate session query to refresh module completion status on session page
-        queryClient.invalidateQueries({ queryKey: ['session', data.module.learningSessionId] });
+      if (data.module.courseId) {
+        queryClient.invalidateQueries({ queryKey: ['modules', data.module.courseId] });
+        // Invalidate course query to refresh module completion status on course page
+        queryClient.invalidateQueries({ queryKey: ['course', data.module.courseId] });
       }
     },
   });

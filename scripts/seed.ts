@@ -13,7 +13,7 @@ async function main() {
   // Clean existing data (optional - comment out if you want to keep existing data)
   console.log('Cleaning existing data...');
   await prisma.module.deleteMany();
-  await prisma.learningSession.deleteMany();
+  await prisma.course.deleteMany();
   await prisma.user.deleteMany();
   console.log('Cleaned existing data\n');
 
@@ -38,9 +38,9 @@ async function main() {
   console.log(`Created user: ${user1.name} (ID: ${user1.id})`);
   console.log(`Created user: ${user2.name} (ID: ${user2.id})\n`);
 
-  // Create learning sessions
-  console.log('Creating learning sessions...');
-  const session1 = await prisma.learningSession.create({
+  // Create courses
+  console.log('Creating courses...');
+  const course1 = await prisma.course.create({
     data: {
       userId: user1.id,
       name: 'Introduction to TypeScript',
@@ -77,7 +77,7 @@ async function main() {
     },
   });
 
-  const session2 = await prisma.learningSession.create({
+  const course2 = await prisma.course.create({
     data: {
       userId: user1.id,
       name: 'Machine Learning Fundamentals',
@@ -107,7 +107,7 @@ async function main() {
     },
   });
 
-  const session3 = await prisma.learningSession.create({
+  const course3 = await prisma.course.create({
     data: {
       userId: user2.id,
       name: 'Web Development with Next.js',
@@ -130,16 +130,16 @@ async function main() {
     },
   });
 
-  console.log(`Created session: ${session1.name} (ID: ${session1.id})`);
-  console.log(`   - Modules: ${session1.modules.length}`);
-  console.log(`Created session: ${session2.name} (ID: ${session2.id})`);
-  console.log(`   - Modules: ${session2.modules.length}`);
-  console.log(`Created session: ${session3.name} (ID: ${session3.id})`);
-  console.log(`   - Modules: ${session3.modules.length}\n`);
+  console.log(`Created course: ${course1.name} (ID: ${course1.id})`);
+  console.log(`   - Modules: ${course1.modules.length}`);
+  console.log(`Created course: ${course2.name} (ID: ${course2.id})`);
+  console.log(`   - Modules: ${course2.modules.length}`);
+  console.log(`Created course: ${course3.name} (ID: ${course3.id})`);
+  console.log(`   - Modules: ${course3.modules.length}\n`);
 
   // Create chat messages for one of the modules
   console.log('Creating chat messages...');
-  const firstModule = session1.modules[0];
+  const firstModule = course1.modules[0];
 
   await prisma.module.update({
     where: { id: firstModule.id },
@@ -171,17 +171,17 @@ async function main() {
   console.log('Seed Summary:');
   console.log('================');
   console.log(`Users created: 2`);
-  console.log(`Sessions created: 3`);
-  console.log(`Modules created: ${session1.modules.length + session2.modules.length + session3.modules.length}`);
+  console.log(`Courses created: 3`);
+  console.log(`Modules created: ${course1.modules.length + course2.modules.length + course3.modules.length}`);
   console.log(`Chat messages created: 4\n`);
 
   console.log('Test Data IDs (use these in your test scripts):');
   console.log('==================================================');
   console.log(`User 1 ID: ${user1.id}`);
   console.log(`User 2 ID: ${user2.id}`);
-  console.log(`Session 1 ID: ${session1.id}`);
-  console.log(`Session 2 ID: ${session2.id}`);
-  console.log(`Session 3 ID: ${session3.id}`);
+  console.log(`Course 1 ID: ${course1.id}`);
+  console.log(`Course 2 ID: ${course2.id}`);
+  console.log(`Course 3 ID: ${course3.id}`);
   console.log(`Module 1 ID: ${firstModule.id}`);
   console.log('\nSeed completed successfully!');
 }

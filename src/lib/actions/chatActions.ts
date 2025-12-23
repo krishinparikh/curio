@@ -3,7 +3,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma/db';
 import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/prompts';
+import { getPrompt } from '@/lib/old_prompts';
 import { Message } from '@/lib/ai/types';
 import { getModuleById } from './moduleActions';
 import { getUserData } from './userActions';
@@ -19,14 +19,14 @@ export interface SendMessageInput {
 
 /**
  * Retrieves all chat messages for a module
- * Verifies that the user owns the module's session
+ * Verifies that the user owns the module's course
  */
 export async function getMessages(moduleId: string, userId: string): Promise<Message[]> {
   const moduleData = await prisma.module.findUnique({
     where: { id: moduleId },
     select: {
       messages: true,
-      learningSession: {
+      course: {
         select: { userId: true },
       },
     },
@@ -36,8 +36,8 @@ export async function getMessages(moduleId: string, userId: string): Promise<Mes
     throw new Error('Module not found');
   }
 
-  // Authorization check: verify user owns the session this module belongs to
-  if (moduleData.learningSession.userId !== userId) {
+  // Authorization check: verify user owns the course this module belongs to
+  if (moduleData.course.userId !== userId) {
     throw new Error('Unauthorized: You do not have access to this module');
   }
 
@@ -49,7 +49,7 @@ export async function getMessages(moduleId: string, userId: string): Promise<Mes
 
 /**
  * Adds a single message to the module's message array
- * Verifies that the user owns the module's session
+ * Verifies that the user owns the module's course
  */
 export async function addMessage(moduleId: string, message: Message, userId: string): Promise<void> {
   const currentMessages = await getMessages(moduleId, userId);
@@ -101,8 +101,8 @@ export async function createFollowUpQuestions(
       numQuestions,
       moduleName: moduleData.name,
       moduleOverview: moduleData.overview,
-      sessionName: moduleData.learningSession.name,
-      sessionDescription: moduleData.learningSession.description || 'No description',
+      courseName: moduleData.course.name,
+      courseDescription: moduleData.course.description || 'No description',
       userBio,
     });
 

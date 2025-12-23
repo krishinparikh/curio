@@ -2,11 +2,11 @@
 
 import { prisma } from '@/lib/prisma/db';
 import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/prompts';
+import { getPrompt } from '@/lib/old_prompts';
 
 const openai = new OpenAIProvider('gpt-4o-mini');
 
-export interface CreateSessionInput {
+export interface CreateCourseInput {
   userId: string;
   topic: string;
   description?: string;
@@ -22,18 +22,18 @@ export interface ModuleGeneration {
 }
 
 /**
- * Creates a new learning session with AI-generated modules
+ * Creates a new course with AI-generated modules
  *
  * Flow:
- * 1. Call OpenAI to generate session description and module structure based on topic
+ * 1. Call OpenAI to generate course description and module structure based on topic
  * 2. Validate that at least one module was generated
  * 3. Iteratively generate content for each module
- * 4. Create session and modules in database transaction
+ * 4. Create course and modules in database transaction
  *
  * @throws Error if AI fails to generate valid modules
  * @throws Error if user not found
  */
-export async function createLearningSession(input: CreateSessionInput) {
+export async function createCourse(input: CreateCourseInput) {
   const { userId, topic, length = 'medium', complexity = 'intermediate' } = input;
 
   // Verify user exists
@@ -45,19 +45,19 @@ export async function createLearningSession(input: CreateSessionInput) {
     throw new Error('User not found');
   }
 
-  // Generate session title, description, and modules using OpenAI
-  const { sessionTitle, sessionDescription, modules } = await generateModules(topic, length, complexity);
+  // Generate course title, description, and modules using OpenAI
+  const { courseTitle, courseDescription, modules } = await generateModules(topic, length, complexity);
 
   if (!modules || modules.length === 0) {
     throw new Error('Failed to generate learning modules. Please try again with a different topic.');
   }
 
-  // Create session with modules in a transaction
-  const session = await prisma.learningSession.create({
+  // Create course with modules in a transaction
+  const course = await prisma.course.create({
     data: {
       userId,
-      name: sessionTitle,
-      description: sessionDescription,
+      name: courseTitle,
+      description: courseDescription,
       originalPrompt: topic,
       modules: {
         create: modules,
@@ -70,14 +70,14 @@ export async function createLearningSession(input: CreateSessionInput) {
     },
   });
 
-  return session;
+  return course;
 }
 
 /**
- * Retrieves all learning sessions for a user
+ * Retrieves all courses for a user
  */
-export async function getLearningSessions(userId: string) {
-  return prisma.learningSession.findMany({
+export async function getCourses(userId: string) {
+  return prisma.course.findMany({
     where: { userId },
     include: {
       modules: {
@@ -88,18 +88,18 @@ export async function getLearningSessions(userId: string) {
       },
     },
     orderBy: {
-      lastUpdated: 'desc', // Most recently updated first
+      lastActive: 'desc', // Most recently updated first
     },
   });
 }
 
 /**
- * Retrieves a single learning session by ID
- * Verifies that the user owns the session
+ * Retrieves a single course by ID
+ * Verifies that the user owns the course
  */
-export async function getLearningSessionById(sessionId: string, userId: string) {
-  const session = await prisma.learningSession.findUnique({
-    where: { id: sessionId },
+export async function getCourseById(courseId: string, userId: string) {
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
     include: {
       modules: {
         orderBy: { order: 'asc' },
@@ -107,36 +107,36 @@ export async function getLearningSessionById(sessionId: string, userId: string) 
     },
   });
 
-  // Authorization check: verify user owns this session
-  if (session && session.userId !== userId) {
-    throw new Error('Unauthorized: You do not have access to this session');
+  // Authorization check: verify user owns this course
+  if (course && course.userId !== userId) {
+    throw new Error('Unauthorized: You do not have access to this course');
   }
 
-  return session;
+  return course;
 }
 
 /**
- * Deletes a learning session and its associated modules
- * Verifies that the user owns the session before deletion
+ * Deletes a course and its associated modules
+ * Verifies that the user owns the course before deletion
  */
-export async function deleteLearningSession(sessionId: string, userId: string) {
-  // Verify session exists and user owns it
-  const session = await prisma.learningSession.findUnique({
-    where: { id: sessionId },
+export async function deleteCourse(courseId: string, userId: string) {
+  // Verify course exists and user owns it
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
     select: { userId: true },
   });
 
-  if (!session) {
-    throw new Error('Session not found');
+  if (!course) {
+    throw new Error('Course not found');
   }
 
-  if (session.userId !== userId) {
-    throw new Error('Unauthorized: You do not have access to this session');
+  if (course.userId !== userId) {
+    throw new Error('Unauthorized: You do not have access to this course');
   }
 
-  // Delete session (modules will be cascade deleted due to foreign key relationship)
-  await prisma.learningSession.delete({
-    where: { id: sessionId },
+  // Delete course (modules will be cascade deleted due to foreign key relationship)
+  await prisma.course.delete({
+    where: { id: courseId },
   });
 }
 
@@ -144,7 +144,7 @@ export async function deleteLearningSession(sessionId: string, userId: string) {
  * Helper: Generate content (overview) for a specific module
  *
  * @param moduleName - The name of the module
- * @param topic - The overall topic of the learning session
+ * @param topic - The overall topic of the course
  * @param complexity - The complexity level
  * @returns A 2-3 paragraph overview with learning objectives
  */
@@ -189,20 +189,20 @@ async function generateModuleContent(
 }
 
 /**
- * Internal: Generate learning session title, description, and modules using OpenAI
+ * Internal: Generate course title, description, and modules using OpenAI
  *
- * First generates the session title, description, and module structure (names and order),
+ * First generates the course title, description, and module structure (names and order),
  * then iteratively populates each module with detailed content.
  */
 async function generateModules(
   topic: string,
   length: string,
   complexity: string
-): Promise<{ sessionTitle: string; sessionDescription: string; modules: ModuleGeneration[] }> {
+): Promise<{ courseTitle: string; courseDescription: string; modules: ModuleGeneration[] }> {
   const moduleCount = length === 'short' ? 3 : length === 'medium' ? 5 : 7;
 
   try {
-    // Step 1: Generate session title, description, and module structure in a single call
+    // Step 1: Generate course title, description, and module structure in a single call
     const prompt = getPrompt('sessionStructureGenerator.md', {
       complexity,
       length,
@@ -237,8 +237,8 @@ async function generateModules(
       throw new Error('Invalid response structure from OpenAI');
     }
 
-    const sessionTitle = parsed.sessionTitle;
-    const sessionDescription = parsed.sessionDescription;
+    const courseTitle = parsed.sessionTitle;
+    const courseDescription = parsed.sessionDescription;
     const moduleStructure = parsed.modules;
 
     // Step 2: Generate content for each module concurrently
@@ -257,13 +257,13 @@ async function generateModules(
       })
     );
 
-    return { sessionTitle, sessionDescription, modules };
+    return { courseTitle, courseDescription, modules };
   } catch (error) {
     console.error('Error generating modules with AI:', error);
 
-    // Fallback: return basic session title, description, and module structure
-    const sessionTitle = `Learn ${topic}`;
-    const sessionDescription = `Explore the fundamentals of ${topic} through a structured learning path designed for ${complexity}-level learners. This ${length} curriculum will guide you through key concepts and practical applications, building your knowledge progressively.`;
+    // Fallback: return basic course title, description, and module structure
+    const courseTitle = `Learn ${topic}`;
+    const courseDescription = `Explore the fundamentals of ${topic} through a structured learning path designed for ${complexity}-level learners. This ${length} curriculum will guide you through key concepts and practical applications, building your knowledge progressively.`;
 
     const fallbackModules: ModuleGeneration[] = [];
 
@@ -279,6 +279,6 @@ async function generateModules(
       });
     }
 
-    return { sessionTitle, sessionDescription, modules: fallbackModules };
+    return { courseTitle, courseDescription, modules: fallbackModules };
   }
 }

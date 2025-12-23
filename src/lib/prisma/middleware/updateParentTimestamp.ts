@@ -7,10 +7,10 @@ export const updateParentTimestampExtension = Prisma.defineExtension((client) =>
         async create({ args, query }) {
           const result = await query(args);
 
-          if (result.learningSessionId) {
-            await client.learningSession.update({
-              where: { id: result.learningSessionId },
-              data: { lastUpdated: new Date() }
+          if (result.courseId) {
+            await client.course.update({
+              where: { id: result.courseId },
+              data: { lastActive: new Date() }
             });
           }
 
@@ -19,10 +19,10 @@ export const updateParentTimestampExtension = Prisma.defineExtension((client) =>
         async update({ args, query }) {
           const result = await query(args);
 
-          if (result.learningSessionId) {
-            await client.learningSession.update({
-              where: { id: result.learningSessionId },
-              data: { lastUpdated: new Date() }
+          if (result.courseId) {
+            await client.course.update({
+              where: { id: result.courseId },
+              data: { lastActive: new Date() }
             });
           }
 
@@ -31,12 +31,12 @@ export const updateParentTimestampExtension = Prisma.defineExtension((client) =>
         async updateMany({ args, query }) {
           const result = await query(args);
 
-          // For updateMany, learningSessionId might be a string or a filter object
-          const sessionId = args.where?.learningSessionId;
-          if (sessionId && typeof sessionId === 'string') {
-            await client.learningSession.update({
-              where: { id: sessionId },
-              data: { lastUpdated: new Date() }
+          // For updateMany, courseId might be a string or a filter object
+          const courseId = args.where?.courseId;
+          if (courseId && typeof courseId === 'string') {
+            await client.course.update({
+              where: { id: courseId },
+              data: { lastActive: new Date() }
             });
           }
 

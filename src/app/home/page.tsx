@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useCreateSession } from "./hooks";
+import { useCreateCourse } from "./hooks";
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -17,7 +17,7 @@ export default function HomePage() {
   const userId = session?.user?.id || "";
 
   const getUserQuery = useGetUser(userId);
-  const createSessionMutation = useCreateSession();
+  const createCourseMutation = useCreateCourse();
 
   const firstName = useMemo(() => {
     if (getUserQuery.data?.name) {
@@ -37,12 +37,12 @@ export default function HomePage() {
   const [complexity, setComplexity] = useState<"beginner" | "intermediate" | "advanced">("beginner");
 
   const isLoading = sessionStatus === "loading" || getUserQuery.isLoading;
-  const isCreatingSession = createSessionMutation.isPending;
+  const isCreatingCourse = createCourseMutation.isPending;
 
-  const handleCreateSession = () => {
+  const handleCreateCourse = () => {
     if (!userId || !topic.trim()) return;
 
-    createSessionMutation.mutate({
+    createCourseMutation.mutate({
       userId,
       topic: topic.trim(),
       length,
@@ -65,12 +65,12 @@ export default function HomePage() {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <HomeHeader />
 
-          {/* Loading Overlay for Session Creation */}
-          {isCreatingSession && (
+          {/* Loading Overlay for Course Creation */}
+          {isCreatingCourse && (
             <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center">
               <div className="bg-card border border-border rounded p-8 mx-4 flex flex-col items-center gap-6 shadow-2xl max-w-md">
                 <Spinner className="size-12 text-primary" />
-                <p className="text-base sm:text-lg font-medium text-center text-foreground">Hold tight while your learning session generates...</p>
+                <p className="text-base sm:text-lg font-medium text-center text-foreground">Hold tight while your course generates...</p>
               </div>
             </div>
           )}
@@ -85,14 +85,14 @@ export default function HomePage() {
                 placeholder="Ask Curio to teach you anything..."
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                disabled={isCreatingSession}
+                disabled={isCreatingCourse}
                 className="w-full max-w-2xl h-32 !text-lg resize-none rounded px-4 py-4 bg-card border-border shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0"
               />
 
               <RadioGroup
                 value={length}
                 onValueChange={(value) => setLength(value as "short" | "medium" | "long")}
-                disabled={isCreatingSession}
+                disabled={isCreatingCourse}
                 className="flex flex-wrap justify-center gap-4 sm:gap-8"
               >
                 <div className="flex items-center space-x-2">
@@ -112,7 +112,7 @@ export default function HomePage() {
               <RadioGroup
                 value={complexity}
                 onValueChange={(value) => setComplexity(value as "beginner" | "intermediate" | "advanced")}
-                disabled={isCreatingSession}
+                disabled={isCreatingCourse}
                 className="flex flex-wrap justify-center gap-4 sm:gap-8"
               >
                 <div className="flex items-center space-x-2">
@@ -132,10 +132,10 @@ export default function HomePage() {
               <Button
                 size="lg"
                 className="w-full max-w-2xl h-14 text-base font-semibold rounded shadow-sm hover:shadow-md transition-shadow"
-                onClick={handleCreateSession}
-                disabled={isCreatingSession || !topic.trim()}
+                onClick={handleCreateCourse}
+                disabled={isCreatingCourse || !topic.trim()}
               >
-                Create Learning Session
+                Generate Course
               </Button>
             </div>
           </main>

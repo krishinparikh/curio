@@ -3,29 +3,29 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { getLearningSessionById, deleteLearningSession } from "@/lib/actions/sessionActions";
+import { getCourseById, deleteCourse } from "@/lib/actions/courseActions";
 
-export function useGetSession(sessionId: string) {
+export function useGetCourse(courseId: string) {
     const { data: session } = useSession();
     const userId = session?.user?.id || "";
 
     return useQuery({
-        queryKey: ['session', sessionId],
-        queryFn: () => getLearningSessionById(sessionId, userId),
-        enabled: !!sessionId && !!userId,
+        queryKey: ['course', courseId],
+        queryFn: () => getCourseById(courseId, userId),
+        enabled: !!courseId && !!userId,
     });
 }
 
-export function useDeleteSession() {
+export function useDeleteCourse() {
     const { data: session } = useSession();
     const userId = session?.user?.id || "";
     const router = useRouter();
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (sessionId: string) => deleteLearningSession(sessionId, userId),
+        mutationFn: (courseId: string) => deleteCourse(courseId, userId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['sessions'] });
+            queryClient.invalidateQueries({ queryKey: ['courses'] });
             router.push('/home');
         },
     });

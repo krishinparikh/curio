@@ -8,11 +8,11 @@ import { useRouter } from 'next/navigation';
 
 interface ModuleFooterProps {
   isPaneOpen: boolean;
-  sessionId: string;
+  courseId: string;
   moduleId: string;
 }
 
-export function ModuleFooter({ isPaneOpen, sessionId, moduleId }: ModuleFooterProps) {
+export function ModuleFooter({ isPaneOpen, courseId, moduleId }: ModuleFooterProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id || '';
   const { data: moduleData } = useGetModule(moduleId, userId);
@@ -23,20 +23,20 @@ export function ModuleFooter({ isPaneOpen, sessionId, moduleId }: ModuleFooterPr
     : "px-4 w-full max-w-6xl mx-auto pb-4";
 
   // Find current module index and determine prev/next
-  const modules = moduleData?.learningSession?.modules || [];
+  const modules = moduleData?.course?.modules || [];
   const currentIndex = modules.findIndex(m => m.id === moduleId);
   const previousModule = currentIndex > 0 ? modules[currentIndex - 1] : null;
   const nextModule = currentIndex < modules.length - 1 ? modules[currentIndex + 1] : null;
 
   const handlePrevious = () => {
     if (previousModule) {
-      router.push(`/session/${sessionId}/module/${previousModule.id}`);
+      router.push(`/course/${courseId}/module/${previousModule.id}`);
     }
   };
 
   const handleNext = () => {
     if (nextModule) {
-      router.push(`/session/${sessionId}/module/${nextModule.id}`);
+      router.push(`/course/${courseId}/module/${nextModule.id}`);
     }
   };
 

@@ -1,20 +1,20 @@
-interface SessionTitleSectionProps {
-  sessionName: string;
+interface CourseTitleSectionProps {
+  courseName: string;
   completedModules: number;
   totalModules: number;
 }
 
-export function SessionTitleSection({
-  sessionName,
+export function CourseTitleSection({
+  courseName,
   completedModules,
   totalModules,
-}: SessionTitleSectionProps) {
+}: CourseTitleSectionProps) {
   const progressPercentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   return (
     <div className="mb-4 rounded bg-card p-4 sm:p-8 shadow">
       {/* Header with Title */}
-      <h1 className="text-xl sm:text-3xl font-medium mb-4">{sessionName}</h1>
+      <h1 className="text-xl sm:text-3xl font-medium mb-4">{courseName}</h1>
 
       {/* Progress Bar */}
       <div>

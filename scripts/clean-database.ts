@@ -47,27 +47,27 @@ async function cleanDatabase() {
     // Get counts before deletion
     const counts = {
       modules: await prisma.module.count(),
-      sessions: await prisma.learningSession.count(),
+      courses: await prisma.course.count(),
       users: await prisma.user.count(),
     };
 
     console.log('Current database state:');
     console.log(`   Modules: ${counts.modules}`);
-    console.log(`   Learning Sessions: ${counts.sessions}`);
+    console.log(`   Courses: ${counts.courses}`);
     console.log(`   Users: ${counts.users}\n`);
 
     console.log('Deleting records...\n');
 
     // Delete in order to respect foreign key constraints
-    // Module -> LearningSession -> User
+    // Module -> Course -> User
 
     console.log('   Deleting modules...');
     const deletedModules = await prisma.module.deleteMany();
     console.log(`   Deleted ${deletedModules.count} modules`);
 
-    console.log('   Deleting learning sessions...');
-    const deletedSessions = await prisma.learningSession.deleteMany();
-    console.log(`   Deleted ${deletedSessions.count} learning sessions`);
+    console.log('   Deleting courses...');
+    const deletedCourses = await prisma.course.deleteMany();
+    console.log(`   Deleted ${deletedCourses.count} courses`);
 
     console.log('   Deleting users...');
     const deletedUsers = await prisma.user.deleteMany();
@@ -78,7 +78,7 @@ async function cleanDatabase() {
     console.log('='.repeat(60));
     console.log('\nSummary:');
     console.log(`   Total modules deleted: ${deletedModules.count}`);
-    console.log(`   Total sessions deleted: ${deletedSessions.count}`);
+    console.log(`   Total courses deleted: ${deletedCourses.count}`);
     console.log(`   Total users deleted: ${deletedUsers.count}`);
     console.log('\nTip: Run "npm run seed" to populate with test data\n');
 

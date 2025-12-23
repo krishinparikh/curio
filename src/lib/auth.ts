@@ -6,15 +6,12 @@ import { prisma } from "@/lib/prisma/db"
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET,
+  trustHost: true, // Required for Vercel deployments
+
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          prompt: "select_account", // Force Google to show account selector
-        },
-      },
     }),
   ],
   callbacks: {

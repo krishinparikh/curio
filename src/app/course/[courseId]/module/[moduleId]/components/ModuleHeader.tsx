@@ -21,13 +21,13 @@ import { useGetModule, useMarkModuleComplete } from "../hooks";
 import { constructModuleName } from "@/lib/utils";
 
 interface ModuleHeaderProps {
-  sessionId: string;
+  courseId: string;
   moduleId: string;
   isPaneOpen: boolean;
   onTogglePane: () => void;
 }
 
-export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: ModuleHeaderProps) {
+export function ModuleHeader({ courseId, moduleId, isPaneOpen, onTogglePane }: ModuleHeaderProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
@@ -42,8 +42,8 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
   const handleComplete = async () => {
     try {
       await markModuleCompleteMutation.mutateAsync(moduleId);
-      // Navigate back to session page
-      router.push(`/session/${sessionId}`);
+      // Navigate back to course page
+      router.push(`/course/${courseId}`);
     } catch (error) {
       console.error("Failed to mark module as complete:", error);
     }
@@ -64,7 +64,7 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
                   <Skeleton className="h-5 w-24" />
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link href={`/session/${sessionId}`}>{getModuleQuery.data?.learningSession?.name}</Link>
+                    <Link href={`/course/${courseId}`}>{getModuleQuery.data?.course?.name}</Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
@@ -73,7 +73,7 @@ export function ModuleHeader({ sessionId, moduleId, isPaneOpen, onTogglePane }: 
                   <Skeleton className="h-5 w-8" />
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link href={`/session/${sessionId}`}>...</Link>
+                    <Link href={`/course/${courseId}`}>...</Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
