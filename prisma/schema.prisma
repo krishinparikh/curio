@@ -32,7 +32,7 @@ model Course {
   name           String
   description    String
   originalPrompt String?  @map("original_prompt")
-  lastUpdated    DateTime @default(now()) @map("last_updated")
+  lastActive     DateTime @default(now()) @map("last_active")
   user           User     @relation(fields: [userId], references: [id])
   modules        Module[]
 

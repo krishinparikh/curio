@@ -135,7 +135,7 @@ export default function HomePage() {
                 onClick={handleCreateCourse}
                 disabled={isCreatingCourse || !topic.trim()}
               >
-                Create Course
+                Generate Course
               </Button>
             </div>
           </main>

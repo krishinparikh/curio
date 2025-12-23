@@ -88,7 +88,7 @@ export async function getCourses(userId: string) {
       },
     },
     orderBy: {
-      lastUpdated: 'desc', // Most recently updated first
+      lastActive: 'desc', // Most recently updated first
     },
   });
 }

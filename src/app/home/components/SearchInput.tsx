@@ -22,7 +22,7 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
         </InputGroupText>
       </InputGroupAddon>
       <InputGroupInput
-        placeholder="Search sessions"
+        placeholder="Search courses"
         className="focus-visible:ring-0 focus-visible:ring-offset-0 text-sm bg-transparent placeholder:text-muted-foreground"
         value={value}
         onChange={(e) => onChange(e.target.value)}

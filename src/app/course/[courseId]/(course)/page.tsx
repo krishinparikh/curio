@@ -88,8 +88,8 @@ export default function CoursePage({ params }: CoursePageProps) {
                 value="Intermediate"
               />
               <DescriptionCard
-                heading="Last Updated"
-                value={formatDate(course.lastUpdated)}
+                heading="Last Active"
+                value={formatDate(course.lastActive)}
               />
             </div>
           </div>
