@@ -3,26 +3,26 @@
 import { prisma } from '@/lib/prisma/db';
 
 /**
- * Retrieves all modules for a learning session
- * Verifies that the user owns the session
+ * Retrieves all modules for a course
+ * Verifies that the user owns the course
  */
-export async function getModules(sessionId: string, userId: string) {
-  // First verify the session belongs to the user
-  const session = await prisma.learningSession.findUnique({
-    where: { id: sessionId },
+export async function getModules(courseId: string, userId: string) {
+  // First verify the course belongs to the user
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
     select: { userId: true },
   });
 
-  if (!session) {
-    throw new Error('Session not found');
+  if (!course) {
+    throw new Error('Course not found');
   }
 
-  if (session.userId !== userId) {
-    throw new Error('Unauthorized: You do not have access to this session');
+  if (course.userId !== userId) {
+    throw new Error('Unauthorized: You do not have access to this course');
   }
 
   return prisma.module.findMany({
-    where: { learningSessionId: sessionId },
+    where: { courseId: courseId },
     orderBy: { order: 'asc' },
     select: {
       id: true,
@@ -32,15 +32,15 @@ export async function getModules(sessionId: string, userId: string) {
       isComplete: true,
       messages: true,
       currentFollowUps: true,
-      learningSessionId: true,
+      courseId: true,
     },
   });
 }
 
 /**
  * Retrieves a single module by ID with full context
- * Includes session details and all sibling modules for AI prompt context
- * Verifies that the user owns the module's session
+ * Includes course details and all sibling modules for AI prompt context
+ * Verifies that the user owns the module's course
  */
 export async function getModuleById(moduleId: string, userId: string) {
   const module = await prisma.module.findUnique({
@@ -54,8 +54,8 @@ export async function getModuleById(moduleId: string, userId: string) {
       isComplete: true,
       messages: true,
       currentFollowUps: true,
-      learningSessionId: true,
-      learningSession: {
+      courseId: true,
+      course: {
         select: {
           id: true,
           name: true,
@@ -75,8 +75,8 @@ export async function getModuleById(moduleId: string, userId: string) {
     },
   });
 
-  // Authorization check: verify user owns the session this module belongs to
-  if (module && module.learningSession.userId !== userId) {
+  // Authorization check: verify user owns the course this module belongs to
+  if (module && module.course.userId !== userId) {
     throw new Error('Unauthorized: You do not have access to this module');
   }
 

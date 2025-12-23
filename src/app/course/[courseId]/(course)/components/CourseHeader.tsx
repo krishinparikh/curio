@@ -30,20 +30,20 @@ import {
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
-import { useGetSession, useDeleteSession } from "../hooks";
+import { useGetCourse, useDeleteCourse } from "../hooks";
 
-interface SessionHeaderProps {
-  sessionId: string;
+interface CourseHeaderProps {
+  courseId: string;
 }
 
-export function SessionHeader({ sessionId }: SessionHeaderProps) {
-  const getSessionQuery = useGetSession(sessionId);
-  const deleteSessionMutation = useDeleteSession();
-  const isLoading = getSessionQuery.isLoading;
+export function CourseHeader({ courseId }: CourseHeaderProps) {
+  const getCourseQuery = useGetCourse(courseId);
+  const deleteCourseMutation = useDeleteCourse();
+  const isLoading = getCourseQuery.isLoading;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = () => {
-    deleteSessionMutation.mutate(sessionId);
+    deleteCourseMutation.mutate(courseId);
   };
 
   return (
@@ -60,7 +60,7 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
                   {isLoading ? (
                     <Skeleton className="h-5 w-32" />
                   ) : (
-                    <BreadcrumbPage>{getSessionQuery.data?.name}</BreadcrumbPage>
+                    <BreadcrumbPage>{getCourseQuery.data?.name}</BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -77,7 +77,7 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Session
+                  Delete Course
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -90,17 +90,17 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the session &quot;{getSessionQuery.data?.name}&quot; and all of its modules. This action cannot be undone.
+              This will permanently delete the course &quot;{getCourseQuery.data?.name}&quot; and all of its modules. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteSessionMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteCourseMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={deleteSessionMutation.isPending}
+              disabled={deleteCourseMutation.isPending}
             >
-              {deleteSessionMutation.isPending ? (
+              {deleteCourseMutation.isPending ? (
                 <>
                   <Spinner className="mr-2" />
                   Deleting...

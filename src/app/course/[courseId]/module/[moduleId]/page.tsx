@@ -10,13 +10,13 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 interface ModulePageProps {
   params: Promise<{
-    sessionId: string;
+    courseId: string;
     moduleId: string;
   }>;
 }
 
 export default function ModulePage({ params }: ModulePageProps) {
-  const { sessionId, moduleId } = use(params);
+  const { courseId, moduleId } = use(params);
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
 
@@ -33,7 +33,7 @@ export default function ModulePage({ params }: ModulePageProps) {
     <div className="h-full bg-background flex flex-col overflow-hidden">
       {/* ModuleHeader: visible on desktop always, visible on mobile only when AI pane is closed */}
       <div className={`md:block ${isPaneOpen ? 'hidden' : 'block'}`}>
-        <ModuleHeader sessionId={sessionId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
+        <ModuleHeader courseId={courseId} moduleId={moduleId} isPaneOpen={isPaneOpen} onTogglePane={() => setIsPaneOpen(!isPaneOpen)} />
       </div>
 
       {/* Main Content Area - Resizable Panels */}
@@ -43,7 +43,7 @@ export default function ModulePage({ params }: ModulePageProps) {
           <div className="h-full flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto scrollbar-hide">
               <Content moduleId={moduleId} isPaneOpen={isPaneOpen} />
-              <ModuleFooter isPaneOpen={isPaneOpen} sessionId={sessionId} moduleId={moduleId} />
+              <ModuleFooter isPaneOpen={isPaneOpen} courseId={courseId} moduleId={moduleId} />
             </div>
           </div>
         </Panel>

@@ -1,6 +1,6 @@
 // ONBOARDING
 
-import { Course } from "./schemas";
+import { Course, OnboardingContext } from "./schemas";
 
 export function onboardingSystemPrompt(): string {
   return `You are a world-class personal teacher. A user will request some topic they want to learn; your job is to ask clarifying questions to inform how to create the best possible course for them.
@@ -12,69 +12,46 @@ export function onboardingSystemPrompt(): string {
 }
 
 export function onboardingUserPrompt(originalPrompt: string): string {
-  return `The user (learner) has requested the following prompt:
+  return `The user (learner) has requested the following:
 
   """
   ${originalPrompt}
-  """
-  `;
+  """`;
 }
 
 export function courseGenerationSystemPrompt(): string {
-  return `You are a world-class teacher who is excellent at decomposing complex topics into clear, relatable explanations.
+  return `You are a world-class teacher who is building a personalized course, broken down into modules, for a learner based on a prompt.
 
-  Follow this process:
-  1. Deeply analyze the learner's request, background, and goals
+  Follow this process step-by-step:
+  1. Deeply analyze the learner's request
   2. Define clear, achievable learning outcomes
-  3. Identify specific key concepts and their dependencies to achieve these outcomes
-  4. Break down these concepts into learning modules.
+  3. Identify specific steps required to achieve these outcomes
+  4. Create modules from these steps.
   5. For each module, create:
-    - A name
-    - A descriptive one-sentence overview
-
-  Always think step-by-step before designing the course structure.
+    - A descriptive title
+    - A descriptive overview (1 sentence)
+  6. Create a clear, engaging course name (3-8 words) and description (2-3 sentences) that aligns with what you've planned.
   
   Note:
+  - Create between 3-9 modules
   - The overviews should not include words/phrases like "this module" or "learners"`;
 }
 
-export function courseGenerationUserPrompt(): string {
-  return `Create a structured course with a session title, description, and clear module titles.
-
-  The session title should:
-  - Be concise (4-8 words)
-  - Be engaging and clear
-  - Accurately reflect the topic
-
-  The session description should:
-  - Summarize the overall learning journey
-  - Highlight key outcomes and skills
-  - Be engaging and motivating
-
-  Each module name should:
-  - Be clear and descriptive
-  - Focus on a specific aspect of the topic
-  - Build progressively in complexity
-  - Be appropriate for {{complexity}} level learners
-
-  Each module overview should:
-  - Be a single, concise sentence
-  - Briefly describe what the module covers
-  - Be clear and informative`;
+export function courseGenerationUserPrompt(onboardingContext: OnboardingContext): string {
+  return `Below is the learner's original prompt and additional information they provided about their course:
+  
+  """
+  ${onboardingContext}
+  """`;
 }
 
 
 export function moduleGenerationSystemPrompt(): string {
   return `You are a world-class educator and technical writer. Create comprehensive educational content that deeply explains the given module topic.
+  
+  Include a short "## Overview" at the start, and some "## Key Points" bullet points at the end. Everything in between is your choice: core concept explanations, practical examples and use cases, common pitfalls, how concepts relate to one another, etc. Be thorough and clear.
 
-  Your response should be thorough, detailed instructional content that includes:
-  - Core concepts explained thoroughly with examples
-  - Step-by-step explanations of key ideas and techniques
-  - Practical examples and use cases
-  - Common pitfalls and best practices
-  - How concepts relate to each other and build upon one another
-
-  Return only the educational content in markdown format with headings, code examples, and formatting as appropriate`;
+  Return only the educational content in markdown format with headings, code examples, and formatting as appropriate. Do NOT write an h1 title ("# Title") — only h2s and below.`;
 }
 
 export function moduleGenerationUserPrompt(course: Course, index: number): string {
@@ -88,8 +65,6 @@ export function moduleGenerationUserPrompt(course: Course, index: number): strin
 
   The other modules include:
   ${course.modules} 
-
   
-  Provide in-depth explanations that teach the concepts thoroughly. Include examples, explanations, and practical guidance that helps learners truly understand and apply the material.
-`;
+  Provide in-depth explanations that teach the concepts thoroughly. Include examples, explanations, and practical guidance that helps learners truly understand and apply the material.`;
 }

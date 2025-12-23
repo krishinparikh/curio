@@ -1,20 +1,20 @@
 import { use } from 'react';
-import { SessionHeader } from "./components/SessionHeader";
+import { CourseHeader } from "./components/CourseHeader";
 
-interface SessionLayoutProps {
+interface CourseLayoutProps {
   children: React.ReactNode;
   params: Promise<{
-    sessionId: string;
+    courseId: string;
   }>;
 }
 
-export default function SessionLayout({ children, params }: SessionLayoutProps) {
-  const { sessionId } = use(params);
+export default function CourseLayout({ children, params }: CourseLayoutProps) {
+  const { courseId } = use(params);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <div className="flex-shrink-0">
-        <SessionHeader sessionId={sessionId} />
+        <CourseHeader courseId={courseId} />
       </div>
       <div className="flex-1 overflow-hidden">
         {children}

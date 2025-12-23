@@ -15,47 +15,47 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SearchInput } from "@/app/home/components/SearchInput";
-import { SessionCard } from "@/app/home/components/SessionCard";
+import { CourseCard } from "@/app/home/components/CourseCard";
 import { NavUser } from "@/app/home/components/NavUser";
-import { useGetSessions } from "@/app/home/hooks";
+import { useGetCourses } from "@/app/home/hooks";
 
-const bgBlendPages = ["/session", "/module", "/profile"];
+const bgBlendPages = ["/course", "/module", "/profile"];
 
 export function AppSidebar() {
   const { data: session } = useSession();
   const userId = session?.user?.id || "";
-  const getSessionsQuery = useGetSessions(userId);
+  const getCoursesQuery = useGetCourses(userId);
   const pathname = usePathname();
 
   const shouldBlendBorder = bgBlendPages.some(page => pathname?.startsWith(page));
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const sessionData = useMemo(() => {
-    if (!getSessionsQuery.data) return [];
+  const courseData = useMemo(() => {
+    if (!getCoursesQuery.data) return [];
 
-    return getSessionsQuery.data.map(session => {
-      const totalModules = session.modules.length;
-      const modulesCompleted = session.modules.filter(m => m.isComplete).length;
+    return getCoursesQuery.data.map(course => {
+      const totalModules = course.modules.length;
+      const modulesCompleted = course.modules.filter(m => m.isComplete).length;
       const progress = totalModules > 0 ? Math.round((modulesCompleted / totalModules) * 100) : 0;
 
       return {
-        id: session.id,
-        title: session.name,
+        id: course.id,
+        title: course.name,
         progress,
         modulesCompleted,
         totalModules,
       };
     });
-  }, [getSessionsQuery.data]);
+  }, [getCoursesQuery.data]);
 
-  const filteredSessions = useMemo(() => {
-    if (!searchQuery.trim()) return sessionData;
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery.trim()) return courseData;
 
-    return sessionData.filter((session) =>
-      session.title.toLowerCase().includes(searchQuery.toLowerCase())
+    return courseData.filter((course) =>
+      course.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [sessionData, searchQuery]);
+  }, [courseData, searchQuery]);
 
   return (
     <Sidebar collapsible="icon">
@@ -74,22 +74,22 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <div className="px-4 group-data-[collapsible=icon]:px-0">
-              {getSessionsQuery.isLoading ? (
-                <p className="text-muted-foreground text-center py-8 group-data-[collapsible=icon]:hidden">Loading sessions...</p>
-              ) : filteredSessions.length === 0 ? (
+              {getCoursesQuery.isLoading ? (
+                <p className="text-muted-foreground text-center py-8 group-data-[collapsible=icon]:hidden">Loading courses...</p>
+              ) : filteredCourses.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8 group-data-[collapsible=icon]:hidden">
-                  {searchQuery.trim() ? "No sessions found." : "No learning sessions yet. Create one to get started!"}
+                  {searchQuery.trim() ? "No courses found." : "No courses yet. Create one to get started!"}
                 </p>
               ) : (
-                filteredSessions.map((session, index) => (
-                  <div key={session.id}>
+                filteredCourses.map((course, index) => (
+                  <div key={course.id}>
                     {index > 0 && <div className="border-t border-sidebar-border group-data-[collapsible=icon]:hidden" />}
-                    <SessionCard
-                      id={session.id}
-                      title={session.title}
-                      progress={session.progress}
-                      modulesCompleted={session.modulesCompleted}
-                      totalModules={session.totalModules}
+                    <CourseCard
+                      id={course.id}
+                      title={course.title}
+                      progress={course.progress}
+                      modulesCompleted={course.modulesCompleted}
+                      totalModules={course.totalModules}
                     />
                   </div>
                 ))

@@ -3,50 +3,50 @@
 import { use, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { SessionTitleSection } from './components/SessionTitleSection';
-import { SessionDescription } from './components/SessionDescription';
+import { CourseTitleSection } from './components/CourseTitleSection';
+import { CourseDescription } from './components/CourseDescription';
 import { ModuleList } from './components/ModuleList';
 import DescriptionCard from './components/DescriptionCard';
 import { Spinner } from '@/components/ui/spinner';
-import { useGetSession, useDeleteSession } from './hooks';
+import { useGetCourse, useDeleteCourse } from './hooks';
 import { formatDate } from '@/lib/utils';
 
-interface SessionPageProps {
+interface CoursePageProps {
   params: Promise<{
-    sessionId: string;
+    courseId: string;
   }>;
 }
 
-export default function SessionPage({ params }: SessionPageProps) {
-  const { sessionId } = use(params);
+export default function CoursePage({ params }: CoursePageProps) {
+  const { courseId } = use(params);
   const { status: sessionStatus } = useSession();
 
-  const getSessionQuery = useGetSession(sessionId);
-  const deleteSessionMutation = useDeleteSession();
+  const getCourseQuery = useGetCourse(courseId);
+  const deleteCourseMutation = useDeleteCourse();
 
-  const sessionData = useMemo(() => {
-    if (!getSessionQuery.data) return null;
+  const courseData = useMemo(() => {
+    if (!getCourseQuery.data) return null;
 
-    const session = getSessionQuery.data;
-    const totalModules = session.modules.length;
-    const completedModules = session.modules.filter((m) => m.isComplete).length;
+    const course = getCourseQuery.data;
+    const totalModules = course.modules.length;
+    const completedModules = course.modules.filter((m) => m.isComplete).length;
 
-    // Infer length from module count (based on sessionService.ts:119)
+    // Infer length from module count
     const inferredLength: 'short' | 'medium' | 'long' =
       totalModules <= 3 ? 'short' :
       totalModules <= 5 ? 'medium' :
       'long';
 
     return {
-      session,
+      course,
       totalModules,
       completedModules,
       inferredLength,
     };
-  }, [getSessionQuery.data]);
+  }, [getCourseQuery.data]);
 
   // Show loading while auth session or query is loading
-  if (sessionStatus === 'loading' || getSessionQuery.isLoading) {
+  if (sessionStatus === 'loading' || getCourseQuery.isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
         <Spinner className="size-12" />
@@ -54,27 +54,27 @@ export default function SessionPage({ params }: SessionPageProps) {
     );
   }
 
-  if (!sessionData) {
+  if (!courseData) {
     notFound();
   }
 
-  const { session, totalModules, completedModules, inferredLength } = sessionData;
+  const { course, totalModules, completedModules, inferredLength } = courseData;
 
   return (
     <div className="h-full overflow-auto scrollbar-hide">
       <div className="p-4 w-full mx-auto">
-        <SessionTitleSection
-          sessionName={session.name}
+        <CourseTitleSection
+          courseName={course.name}
           completedModules={completedModules}
           totalModules={totalModules}
         />
 
         {/* Two Column Layout */}
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Left Side - Session Info */}
+          {/* Left Side - Course Info */}
           <div className="flex-1 space-y-4">
-            <SessionDescription
-              description={session.description}
+            <CourseDescription
+              description={course.description}
             />
 
             {/* Three Cards in a Row */}
@@ -89,7 +89,7 @@ export default function SessionPage({ params }: SessionPageProps) {
               />
               <DescriptionCard
                 heading="Last Updated"
-                value={formatDate(session.lastUpdated)}
+                value={formatDate(course.lastUpdated)}
               />
             </div>
           </div>
@@ -97,8 +97,8 @@ export default function SessionPage({ params }: SessionPageProps) {
           {/* Right Side - Module List */}
           <div className="flex-1">
             <ModuleList
-              sessionId={sessionId}
-              modules={session.modules}
+              courseId={courseId}
+              modules={course.modules}
             />
           </div>
         </div>

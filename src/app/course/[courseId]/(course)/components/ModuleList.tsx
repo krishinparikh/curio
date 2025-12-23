@@ -9,11 +9,11 @@ interface Module {
 }
 
 interface ModuleListProps {
-  sessionId: string;
+  courseId: string;
   modules: Module[];
 }
 
-export function ModuleList({ sessionId, modules }: ModuleListProps) {
+export function ModuleList({ courseId, modules }: ModuleListProps) {
   return (
     <div className="rounded bg-card p-4 shadow">
       {/* <h3 className="text-sm text-muted-foreground mb-2">Modules</h3> */}
@@ -21,7 +21,7 @@ export function ModuleList({ sessionId, modules }: ModuleListProps) {
         {modules.map((module, index) => (
           <div key={module.id}>
             <ModuleCard
-              sessionId={sessionId}
+              courseId={courseId}
               moduleId={module.id}
               moduleName={module.name}
               moduleOverview={module.overview}
@@ -37,7 +37,7 @@ export function ModuleList({ sessionId, modules }: ModuleListProps) {
 
       {modules.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          <p>No modules available for this session.</p>
+          <p>No modules available for this course.</p>
         </div>
       )}
     </div>

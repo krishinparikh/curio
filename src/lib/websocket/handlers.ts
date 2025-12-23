@@ -52,15 +52,15 @@ export async function handleAIChatGeneration(
     const userBio = userData.bio || 'No bio provided yet.';
 
     // Format all modules list for prompt
-    const allModulesFormatted = moduleContext.learningSession.modules
+    const allModulesFormatted = moduleContext.course.modules
       .map((mod) => `${mod.order}. **${mod.name}**: ${mod.overview}`)
       .join('\n');
 
     // Load context-aware system prompt
     const promptVariables = {
       moduleName: moduleContext.name,
-      sessionName: moduleContext.learningSession.name,
-      sessionDescription: moduleContext.learningSession.description,
+      courseName: moduleContext.course.name,
+      courseDescription: moduleContext.course.description,
       allModules: allModulesFormatted,
       moduleOrder: String(moduleContext.order),
       moduleOverview: moduleContext.overview,
@@ -72,9 +72,9 @@ export async function handleAIChatGeneration(
     // Debug logging to verify context is loaded
     console.log('[AI Context Debug]', {
       moduleName: promptVariables.moduleName,
-      sessionName: promptVariables.sessionName,
+      courseName: promptVariables.courseName,
       moduleContentLength: promptVariables.moduleContent.length,
-      allModulesCount: moduleContext.learningSession.modules.length,
+      allModulesCount: moduleContext.course.modules.length,
       userName: promptVariables.userName,
       userBio: promptVariables.userBio,
     });

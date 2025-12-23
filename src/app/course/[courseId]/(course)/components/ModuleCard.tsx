@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { constructModuleName } from '@/lib/utils';
 
 interface ModuleCardProps {
-  sessionId: string;
+  courseId: string;
   moduleId: string;
   moduleName: string;
   moduleOverview: string;
@@ -11,14 +11,14 @@ interface ModuleCardProps {
 }
 
 export function ModuleCard({
-  sessionId,
+  courseId,
   moduleId,
   moduleName,
   moduleOverview,
   moduleOrder
 }: ModuleCardProps) {
   return (
-    <Link href={`/session/${sessionId}/module/${moduleId}`}>
+    <Link href={`/course/${courseId}/module/${moduleId}`}>
       <div className="group relative p-4 hover:bg-accent transition-colors cursor-pointer">
         <h3 className="font-medium text-base group-hover:text-accent-foreground transition-colors mb-2">
           {constructModuleName(moduleOrder, moduleName)}

@@ -2,28 +2,28 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { getLearningSessions, createLearningSession, CreateSessionInput } from "@/lib/actions/sessionActions";
+import { getCourses, createCourse, CreateCourseInput } from "@/lib/actions/courseActions";
 
-export function useGetSessions(userId: string) {
+export function useGetCourses(userId: string) {
     return useQuery({
-        queryKey: ['sessions', userId],
-        queryFn: () => getLearningSessions(userId),
+        queryKey: ['courses', userId],
+        queryFn: () => getCourses(userId),
         enabled: !!userId,
     });
 }
 
-export function useCreateSession() {
+export function useCreateCourse() {
     const queryClient = useQueryClient();
     const router = useRouter();
 
     return useMutation({
-        mutationFn: (input: CreateSessionInput) => createLearningSession(input),
+        mutationFn: (input: CreateCourseInput) => createCourse(input),
         onSuccess: (data, variables) => {
-            // Invalidate sessions query to refresh the list
-            queryClient.invalidateQueries({ queryKey: ['sessions', variables.userId] });
+            // Invalidate courses query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['courses', variables.userId] });
 
-            // Navigate to the new session page
-            router.push(`/session/${data.id}`);
+            // Navigate to the new course page
+            router.push(`/course/${data.id}`);
         },
     });
 }

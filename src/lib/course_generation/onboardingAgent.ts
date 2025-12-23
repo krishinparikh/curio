@@ -15,11 +15,6 @@ export class OnboardingAgent {
 
   // }
 
-  isDoneAsking(answersCount: number): boolean {
-    // Could be more sophisticated - e.g., LLM decides
-    return answersCount >= this.maxQuestions;
-  }
-
   // synthesizeContext() {
     
   // }
