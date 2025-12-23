@@ -19,7 +19,8 @@
     "test:session": "tsx scripts/test-services/test-session-service.ts",
     "test:module": "tsx scripts/test-services/test-module-service.ts",
     "test:chat": "tsx scripts/test-services/test-chat-service.ts",
-    "test:all": "tsx scripts/test-all.ts"
+    "test:all": "tsx scripts/test-all.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

@@ -29,7 +29,7 @@ export default function CoursePage({ params }: CoursePageProps) {
 
     const course = getCourseQuery.data;
     const totalModules = course.modules.length;
-    const completedModules = course.modules.filter((m) => m.isComplete).length;
+    const completedModules = course.modules.filter((m: any) => m.isComplete).length;
 
     // Infer length from module count
     const inferredLength: 'short' | 'medium' | 'long' =
