@@ -7,6 +7,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET,
   trustHost: true, // Required for Vercel deployments
+  basePath: "/api/auth",
+
+  // Use PKCE for better security
+  useSecureCookies: process.env.NODE_ENV === 'production',
+
+  // Explicit cookie configuration for PKCE
+  cookies: {
+    pkceCodeVerifier: {
+      name: "next-auth.pkce.code_verifier",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 15, // 15 minutes
+      },
+    },
+  },
+
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -14,8 +33,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorization: {
         params: {
           prompt: "select_account", // Force Google to show account selector
+          access_type: "offline",
+          response_type: "code",
         },
       },
+      // Explicitly set PKCE
+      checks: ["pkce", "state"],
     }),
   ],
   callbacks: {
