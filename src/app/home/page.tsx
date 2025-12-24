@@ -3,11 +3,10 @@
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { HomeHeader } from "./components/HomeHeader";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useCreateCourse } from "./hooks";
+import { CourseInput } from "./components/course_input/CourseInput";
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -75,22 +74,12 @@ export default function HomePage() {
                 {firstName ? `What do you want to learn today, ${firstName}?` : "What do you want to learn today?"}
               </h1>
 
-              <Textarea
-                placeholder="Ask Curio to teach you anything..."
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                disabled={isCreatingCourse}
-                className="w-full max-w-2xl h-32 !text-lg resize-none rounded px-4 py-4 bg-card border-border shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0"
+              <CourseInput
+                topic={topic}
+                setTopic={setTopic}
+                isCreatingCourse={isCreatingCourse}
+                onSubmit={handleCreateCourse}
               />
-
-              <Button
-                size="lg"
-                className="w-full max-w-2xl h-14 text-base font-semibold rounded shadow-sm hover:shadow-md transition-shadow"
-                onClick={handleCreateCourse}
-                disabled={isCreatingCourse || !topic.trim()}
-              >
-                Generate Course
-              </Button>
             </div>
           </main>
     </div>

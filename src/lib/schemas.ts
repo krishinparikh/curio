@@ -23,8 +23,7 @@ export const CourseSchema = z.object({
   description: z.string(),
   modules: z.array(z.object({
     name: z.string(),
-    overview: z.string(),
-    order: z.number()
+    overview: z.string()
   })).min(3).max(9)
 })
 
