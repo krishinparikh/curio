@@ -77,15 +77,11 @@ export default function CoursePage({ params }: CoursePageProps) {
               description={course.description}
             />
 
-            {/* Three Cards in a Row */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* Two Cards in a Row */}
+            <div className="grid grid-cols-2 gap-4">
               <DescriptionCard
                 heading="Length"
-                value={inferredLength.charAt(0).toUpperCase() + inferredLength.slice(1)}
-              />
-              <DescriptionCard
-                heading="Difficulty"
-                value="Intermediate"
+                value={`${totalModules} Module${totalModules !== 1 ? 's' : ''}`}
               />
               <DescriptionCard
                 heading="Last Active"

@@ -33,7 +33,7 @@ export function CourseInput({ topic, setTopic, isCreatingCourse, onSubmit }: Cou
         onKeyDown={handleKeyDown}
         placeholder="Ask Curio to teach you anything..."
         disabled={isCreatingCourse}
-        className="min-h-0 !text-base pl-4 pt-4 pr-4"
+        className="min-h-0 !text-lg pl-4 pt-4 pr-4"
       />
       <InputGroupAddon align="block-end" className="justify-end">
         <InputGroupButton

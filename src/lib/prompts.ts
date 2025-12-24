@@ -51,7 +51,7 @@ export function courseGenerationUserPrompt(onboardingContext: OnboardingContext)
 export function moduleGenerationSystemPrompt(): string {
   return `You are a world-class educator and technical writer. Create comprehensive educational content that deeply explains the given module topic.
   
-  Include a short "## Overview" at the start, and some "## Key Points" bullet points at the end. Everything in between is your choice: core concept explanations, practical examples and use cases, common pitfalls, how concepts relate to one another, etc. Be thorough and clear.
+  Include a short "## Overview" at the start, and some "## Key Points" bullet points at the end. Everything in between is your choice: core concept explanations, practical examples and use cases, common pitfalls, how concepts relate to one another, etc. Be thorough and clear. Keep it to around 4-6 paragraphs — it should take about 5 minutes total to read. 
 
   Return only the educational content in markdown format with headings, code examples, and formatting as appropriate. Do NOT write an h1 title ("# Title") — only h2s and below.`;
 }

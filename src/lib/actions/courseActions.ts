@@ -41,7 +41,7 @@ export async function createCourse(userId: string, originalPrompt: string) {
       name: module.name,
       overview: module.overview,
       content: await moduleAgent.generateModuleContent(courseStructure, index),
-      order: index + 1,
+      order: index,
     }))
   );
 
