@@ -3,13 +3,10 @@
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { HomeHeader } from "./components/HomeHeader";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useCreateCourse } from "./hooks";
+import { CourseInput } from "./components/course_input/CourseInput";
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -33,8 +30,6 @@ export default function HomePage() {
   }, [getUserQuery.data]);
 
   const [topic, setTopic] = useState("");
-  const [length, setLength] = useState<"short" | "medium" | "long">("short");
-  const [complexity, setComplexity] = useState<"beginner" | "intermediate" | "advanced">("beginner");
 
   const isLoading = sessionStatus === "loading" || getUserQuery.isLoading;
   const isCreatingCourse = createCourseMutation.isPending;
@@ -44,9 +39,7 @@ export default function HomePage() {
 
     createCourseMutation.mutate({
       userId,
-      topic: topic.trim(),
-      length,
-      complexity,
+      originalPrompt: topic.trim(),
     });
   };
 
@@ -75,68 +68,18 @@ export default function HomePage() {
             </div>
           )}
 
-          <main className="flex-1 flex justify-center px-4 sm:px-6 pt-16 sm:pt-36">
+          <main className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-24">
             <div className="w-full max-w-3xl flex flex-col items-center space-y-10 sm:space-y-8 md:space-y-10">
               <h1 className="text-3xl sm:text-4xl md:text-4xl font-medium text-center text-foreground max-w-4xl px-4">
                 {firstName ? `What do you want to learn today, ${firstName}?` : "What do you want to learn today?"}
               </h1>
 
-              <Textarea
-                placeholder="Ask Curio to teach you anything..."
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                disabled={isCreatingCourse}
-                className="w-full max-w-2xl h-32 !text-lg resize-none rounded px-4 py-4 bg-card border-border shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0"
+              <CourseInput
+                topic={topic}
+                setTopic={setTopic}
+                isCreatingCourse={isCreatingCourse}
+                onSubmit={handleCreateCourse}
               />
-
-              <RadioGroup
-                value={length}
-                onValueChange={(value) => setLength(value as "short" | "medium" | "long")}
-                disabled={isCreatingCourse}
-                className="flex flex-wrap justify-center gap-4 sm:gap-8"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="short" id="short" />
-                  <Label htmlFor="short" className="text-base cursor-pointer">Short</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="medium" id="medium" />
-                  <Label htmlFor="medium" className="text-base cursor-pointer">Medium</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="long" id="long" />
-                  <Label htmlFor="long" className="text-base cursor-pointer">Long</Label>
-                </div>
-              </RadioGroup>
-
-              <RadioGroup
-                value={complexity}
-                onValueChange={(value) => setComplexity(value as "beginner" | "intermediate" | "advanced")}
-                disabled={isCreatingCourse}
-                className="flex flex-wrap justify-center gap-4 sm:gap-8"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="beginner" id="beginner" />
-                  <Label htmlFor="beginner" className="text-base cursor-pointer">Beginner</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="intermediate" id="intermediate" />
-                  <Label htmlFor="intermediate" className="text-base cursor-pointer">Intermediate</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="advanced" id="advanced" />
-                  <Label htmlFor="advanced" className="text-base cursor-pointer">Advanced</Label>
-                </div>
-              </RadioGroup>
-
-              <Button
-                size="lg"
-                className="w-full max-w-2xl h-14 text-base font-semibold rounded shadow-sm hover:shadow-md transition-shadow"
-                onClick={handleCreateCourse}
-                disabled={isCreatingCourse || !topic.trim()}
-              >
-                Generate Course
-              </Button>
             </div>
           </main>
     </div>

@@ -27,7 +27,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MoreHorizontal, Trash2, FileText } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 import { useGetCourse, useDeleteCourse } from "../hooks";
@@ -41,6 +49,7 @@ export function CourseHeader({ courseId }: CourseHeaderProps) {
   const deleteCourseMutation = useDeleteCourse();
   const isLoading = getCourseQuery.isLoading;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showPromptDialog, setShowPromptDialog] = useState(false);
 
   const handleDelete = () => {
     deleteCourseMutation.mutate(courseId);
@@ -72,6 +81,10 @@ export function CourseHeader({ courseId }: CourseHeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setShowPromptDialog(true)}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Original Prompt
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
                   onClick={() => setShowDeleteDialog(true)}
@@ -84,6 +97,18 @@ export function CourseHeader({ courseId }: CourseHeaderProps) {
           </div>
         }
       />
+
+      <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Original Prompt</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm">{getCourseQuery.data?.originalPrompt}</p>
+          </div>
+          
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>

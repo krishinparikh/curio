@@ -57,79 +57,59 @@ async function testCourseService() {
       printResult('Output - Course Details with Modules', course);
     }
 
-    // Test 3: createCourse() - Short beginner course
-    console.log('\nTEST 3: createCourse() - Short Beginner Course');
-    const shortCourseInput = {
-      userId,
-      topic: 'Things only Women would know',
-      description: '',
-      length: 'short' as const,
-      complexity: 'beginner' as const,
-    };
-    console.log('Input:', shortCourseInput);
-    console.log('Calling OpenAI API to generate modules...');
+    // Test 3: createCourse() - Simple prompt
+    console.log('\nTEST 3: createCourse() - Simple Prompt');
+    const prompt1 = 'Things only Women would know';
+    console.log('Input:', { userId, originalPrompt: prompt1 });
+    console.log('Calling OpenAI API to generate course and modules...');
 
     const startTime1 = Date.now();
-    const shortCourse = await createCourse(shortCourseInput);
+    const course1 = await createCourse(userId, prompt1);
     const endTime1 = Date.now();
 
     printResult(
       `Output - Course Created with AI-Generated Modules (${endTime1 - startTime1}ms)`,
-      shortCourse
+      course1
     );
 
-    // Test 4: createCourse() - Medium intermediate course
-    console.log('\nTEST 4: createCourse() - Medium Intermediate Course');
-    const mediumCourseInput = {
-      userId,
-      topic: 'RESTful API Design',
-      description: 'Master the principles of designing RESTful APIs',
-      length: 'medium' as const,
-      complexity: 'intermediate' as const,
-    };
-    console.log('Input:', mediumCourseInput);
-    console.log('Calling OpenAI API to generate modules...');
+    // Test 4: createCourse() - Technical topic
+    console.log('\nTEST 4: createCourse() - Technical Topic');
+    const prompt2 = 'RESTful API Design - Master the principles of designing RESTful APIs';
+    console.log('Input:', { userId, originalPrompt: prompt2 });
+    console.log('Calling OpenAI API to generate course and modules...');
 
     const startTime2 = Date.now();
-    const mediumCourse = await createCourse(mediumCourseInput);
+    const course2 = await createCourse(userId, prompt2);
     const endTime2 = Date.now();
 
     printResult(
       `Output - Course Created with AI-Generated Modules (${endTime2 - startTime2}ms)`,
-      mediumCourse
+      course2
     );
 
-    // Test 5: createCourse() - Long advanced course
-    console.log('\nTEST 5: createCourse() - Long Advanced Course');
-    const longCourseInput = {
-      userId,
-      topic: 'Distributed Systems Architecture',
-      description: 'Deep dive into designing scalable distributed systems',
-      length: 'long' as const,
-      complexity: 'advanced' as const,
-    };
-    console.log('Input:', longCourseInput);
-    console.log('Calling OpenAI API to generate modules...');
+    // Test 5: createCourse() - Advanced topic
+    console.log('\nTEST 5: createCourse() - Advanced Topic');
+    const prompt3 = 'Distributed Systems Architecture - Deep dive into designing scalable distributed systems';
+    console.log('Input:', { userId, originalPrompt: prompt3 });
+    console.log('Calling OpenAI API to generate course and modules...');
 
     const startTime3 = Date.now();
-    const longCourse = await createCourse(longCourseInput);
+    const course3 = await createCourse(userId, prompt3);
     const endTime3 = Date.now();
 
     printResult(
       `Output - Course Created with AI-Generated Modules (${endTime3 - startTime3}ms)`,
-      longCourse
+      course3
     );
 
     // Test 6: createCourse() - Invalid user (should fail)
     console.log('\nTEST 6: createCourse() - Invalid User (Expected to Fail)');
-    const invalidUserInput = {
-      userId: '00000000-0000-0000-0000-000000000000',
-      topic: 'Test Topic',
-    };
-    console.log('Input:', invalidUserInput);
+    const invalidUserId = '00000000-0000-0000-0000-000000000000';
+    const testPrompt = 'Test Topic';
+    console.log('Input:', { userId: invalidUserId, originalPrompt: testPrompt });
 
     try {
-      await createCourse(invalidUserInput);
+      await createCourse(invalidUserId, testPrompt);
       printError('Output - This should have failed!', new Error('Expected user not found error'));
     } catch (error: any) {
       printResult('Output - Error Caught (Expected)', {
@@ -142,9 +122,9 @@ async function testCourseService() {
     console.log('\n' + '='.repeat(60));
     console.log('Course Creation Summary:');
     console.log('='.repeat(60));
-    console.log(`Short course modules: ${shortCourse.modules.length}`);
-    console.log(`Medium course modules: ${mediumCourse.modules.length}`);
-    console.log(`Long course modules: ${longCourse.modules.length}`);
+    console.log(`Course 1 modules: ${course1.modules.length}`);
+    console.log(`Course 2 modules: ${course2.modules.length}`);
+    console.log(`Course 3 modules: ${course3.modules.length}`);
     console.log('\nCourse Service Tests Completed Successfully!');
     console.log('='.repeat(60));
 
