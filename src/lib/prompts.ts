@@ -41,8 +41,10 @@ export function courseGenerationUserPrompt(onboardingContext: OnboardingContext)
   return `Below is the learner's original prompt and additional information they provided about their course:
   
   """
-  ${onboardingContext}
-  """`;
+  ${onboardingContext.originalPrompt}
+  """
+  
+  Create a comprehensive course from this.`;
 }
 
 
@@ -64,7 +66,7 @@ export function moduleGenerationUserPrompt(course: Course, index: number): strin
   ${course.name}: ${course.description}
 
   The other modules include:
-  ${course.modules} 
+  ${course.modules.map((m, i) => `${i + 1}. ${m.name}: ${m.overview}`).join('\n ')} 
   
   Provide in-depth explanations that teach the concepts thoroughly. Include examples, explanations, and practical guidance that helps learners truly understand and apply the material.`;
 }

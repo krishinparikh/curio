@@ -1,5 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { Course, OnboardingContext } from "./../schemas";
+import { courseGenerationSystemPrompt, courseGenerationUserPrompt } from "../prompts";
+import { Course, OnboardingContext, CourseSchema } from "./../schemas";
 
 export class CourseGenerationAgent {
   private model: ChatOpenAI;
@@ -11,9 +12,16 @@ export class CourseGenerationAgent {
     });
   }
 
-  // async generateCourse(context: OnboardingContext): Promise<Course> {
-    
-  // }
+  async generateCourse(context: OnboardingContext): Promise<Course> {
+    const structuredModel = this.model.withStructuredOutput(CourseSchema);
+
+    const result = await structuredModel.invoke([
+      { role: "system", content: courseGenerationSystemPrompt() },
+      { role: "user", content: courseGenerationUserPrompt(context) }
+    ]);
+
+    return result;
+  }
 
   // private validateCourse() {
     

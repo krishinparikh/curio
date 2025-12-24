@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { getCourses, createCourse, CreateCourseInput } from "@/lib/actions/courseActions";
+import { getCourses, createCourse } from "@/lib/actions/courseActions";
 
 export function useGetCourses(userId: string) {
     return useQuery({
@@ -17,7 +17,8 @@ export function useCreateCourse() {
     const router = useRouter();
 
     return useMutation({
-        mutationFn: (input: CreateCourseInput) => createCourse(input),
+        mutationFn: ({ userId, originalPrompt }: { userId: string; originalPrompt: string }) =>
+            createCourse(userId, originalPrompt),
         onSuccess: (data, variables) => {
             // Invalidate courses query to refresh the list
             queryClient.invalidateQueries({ queryKey: ['courses', variables.userId] });

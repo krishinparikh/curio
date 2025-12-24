@@ -12,7 +12,7 @@ export type OnboardingQuestion = z.infer<typeof OnboardingQuestionSchema>;
 
 // Shared context type
 export const OnboardingContextSchema = z.object ({
-  
+  originalPrompt: z.string()
 });
 
 export type OnboardingContext = z.infer<typeof OnboardingContextSchema>;
@@ -29,8 +29,6 @@ export const CourseSchema = z.object({
 })
 
 export type Course = z.infer<typeof CourseSchema>;
-
-
 
 export interface Module {
   id: string;

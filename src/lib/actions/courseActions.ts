@@ -1,41 +1,23 @@
 'use server'
 
 import { prisma } from '@/lib/prisma/db';
-import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/old_prompts';
-
-const openai = new OpenAIProvider('gpt-4o-mini');
-
-export interface CreateCourseInput {
-  userId: string;
-  topic: string;
-  description?: string;
-  length?: 'short' | 'medium' | 'long';
-  complexity?: 'beginner' | 'intermediate' | 'advanced';
-}
-
-export interface ModuleGeneration {
-  name: string;
-  overview: string;
-  content: string;
-  order: number;
-}
+import { CourseGenerationAgent } from '@/lib/course_generation/courseGenerationAgent';
+import { ModuleGenerationAgent } from '@/lib/course_generation/moduleGenerationAgent';
+import { OnboardingContext } from '@/lib/schemas';
 
 /**
  * Creates a new course with AI-generated modules
  *
  * Flow:
- * 1. Call OpenAI to generate course description and module structure based on topic
- * 2. Validate that at least one module was generated
- * 3. Iteratively generate content for each module
- * 4. Create course and modules in database transaction
+ * 1. Verify user exists
+ * 2. Build OnboardingContext from originalPrompt
+ * 3. Use CourseGenerationAgent to generate course structure
+ * 4. Use ModuleGenerationAgent to generate content for each module concurrently
+ * 5. Save course and modules to database in transaction
  *
- * @throws Error if AI fails to generate valid modules
  * @throws Error if user not found
  */
-export async function createCourse(input: CreateCourseInput) {
-  const { userId, topic, length = 'medium', complexity = 'intermediate' } = input;
-
+export async function createCourse(userId: string, originalPrompt: string) {
   // Verify user exists
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -45,22 +27,33 @@ export async function createCourse(input: CreateCourseInput) {
     throw new Error('User not found');
   }
 
-  // Generate course title, description, and modules using OpenAI
-  const { courseTitle, courseDescription, modules } = await generateModules(topic, length, complexity);
+  // Build onboarding context
+  const context: OnboardingContext = { originalPrompt };
 
-  if (!modules || modules.length === 0) {
-    throw new Error('Failed to generate learning modules. Please try again with a different topic.');
-  }
+  // Generate course structure using CourseGenerationAgent
+  const courseAgent = new CourseGenerationAgent();
+  const courseStructure = await courseAgent.generateCourse(context);
+
+  // Generate all module content concurrently using ModuleGenerationAgent
+  const moduleAgent = new ModuleGenerationAgent();
+  const modulesWithContent = await Promise.all(
+    courseStructure.modules.map(async (module, index) => ({
+      name: module.name,
+      overview: module.overview,
+      content: await moduleAgent.generateModuleContent(courseStructure, index),
+      order: module.order,
+    }))
+  );
 
   // Create course with modules in a transaction
   const course = await prisma.course.create({
     data: {
       userId,
-      name: courseTitle,
-      description: courseDescription,
-      originalPrompt: topic,
+      name: courseStructure.name,
+      description: courseStructure.description,
+      originalPrompt,
       modules: {
-        create: modules,
+        create: modulesWithContent,
       },
     },
     include: {
@@ -138,147 +131,4 @@ export async function deleteCourse(courseId: string, userId: string) {
   await prisma.course.delete({
     where: { id: courseId },
   });
-}
-
-/**
- * Helper: Generate content (overview) for a specific module
- *
- * @param moduleName - The name of the module
- * @param topic - The overall topic of the course
- * @param complexity - The complexity level
- * @returns A 2-3 paragraph overview with learning objectives
- */
-async function generateModuleContent(
-  moduleName: string,
-  topic: string,
-  complexity: string
-): Promise<string> {
-  try {
-    const prompt = getPrompt('moduleContentGenerator.md', {
-      complexity,
-      moduleName,
-      topic,
-    });
-
-    const responseContent = await openai.complete(
-      [
-        {
-          role: 'system',
-          content: prompt.system,
-        },
-        {
-          role: 'user',
-          content: prompt.user!,
-        },
-      ],
-      {
-        temperature: 0.7,
-      }
-    );
-
-    if (!responseContent) {
-      throw new Error('Empty response from OpenAI');
-    }
-
-    return responseContent.trim();
-  } catch (error) {
-    console.error('Error generating module content:', error);
-    // Fallback content
-    return `This module focuses on ${moduleName.toLowerCase()} within the context of ${topic}. You will explore key concepts and develop practical skills appropriate for ${complexity}-level learners.\n\nThrough this module, you'll gain hands-on experience and build a solid foundation that prepares you for more advanced topics. The content is designed to be engaging and applicable to real-world scenarios.`;
-  }
-}
-
-/**
- * Internal: Generate course title, description, and modules using OpenAI
- *
- * First generates the course title, description, and module structure (names and order),
- * then iteratively populates each module with detailed content.
- */
-async function generateModules(
-  topic: string,
-  length: string,
-  complexity: string
-): Promise<{ courseTitle: string; courseDescription: string; modules: ModuleGeneration[] }> {
-  const moduleCount = length === 'short' ? 3 : length === 'medium' ? 5 : 7;
-
-  try {
-    // Step 1: Generate course title, description, and module structure in a single call
-    const prompt = getPrompt('sessionStructureGenerator.md', {
-      complexity,
-      length,
-      topic,
-      moduleCount,
-    });
-
-    const responseContent = await openai.complete(
-      [
-        {
-          role: 'system',
-          content: prompt.system,
-        },
-        {
-          role: 'user',
-          content: prompt.user!,
-        },
-      ],
-      {
-        temperature: 0.7,
-        responseFormat: 'json_object',
-      }
-    );
-
-    if (!responseContent) {
-      throw new Error('Empty response from OpenAI');
-    }
-
-    const parsed = JSON.parse(responseContent);
-
-    if (!parsed.sessionTitle || !parsed.sessionDescription || !Array.isArray(parsed.modules)) {
-      throw new Error('Invalid response structure from OpenAI');
-    }
-
-    const courseTitle = parsed.sessionTitle;
-    const courseDescription = parsed.sessionDescription;
-    const moduleStructure = parsed.modules;
-
-    // Step 2: Generate content for each module concurrently
-    const modules: ModuleGeneration[] = await Promise.all(
-      moduleStructure.map(async (module: { name: string; overview?: string }, i: number) => {
-        const moduleName = module.name;
-        const moduleOverview = module.overview || `Learn about ${moduleName.toLowerCase()}`;
-        const content = await generateModuleContent(moduleName, topic, complexity);
-
-        return {
-          name: moduleName,
-          overview: moduleOverview,
-          content: content,
-          order: i,
-        };
-      })
-    );
-
-    return { courseTitle, courseDescription, modules };
-  } catch (error) {
-    console.error('Error generating modules with AI:', error);
-
-    // Fallback: return basic course title, description, and module structure
-    const courseTitle = `Learn ${topic}`;
-    const courseDescription = `Explore the fundamentals of ${topic} through a structured learning path designed for ${complexity}-level learners. This ${length} curriculum will guide you through key concepts and practical applications, building your knowledge progressively.`;
-
-    const fallbackModules: ModuleGeneration[] = [];
-
-    for (let i = 0; i < moduleCount; i++) {
-      const moduleName = `Module ${i + 1}: ${topic}`;
-      const fallbackContent = `This module covers fundamental concepts of ${topic}. You will learn key principles and practical applications appropriate for ${complexity}-level learners.\n\nThe content is structured to build your knowledge progressively, ensuring you develop both theoretical understanding and practical skills.`;
-
-      fallbackModules.push({
-        name: moduleName,
-        overview: fallbackContent,
-        content: fallbackContent,
-        order: i,
-      });
-    }
-
-    return { courseTitle, courseDescription, modules: fallbackModules };
-  }
 }
