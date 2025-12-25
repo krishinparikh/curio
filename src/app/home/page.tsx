@@ -5,8 +5,8 @@ import { useSession } from "next-auth/react";
 import { HomeHeader } from "./components/HomeHeader";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useCreateCourse } from "./hooks";
 import { CourseInput } from "./components/course_input/CourseInput";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -14,7 +14,7 @@ export default function HomePage() {
   const userId = session?.user?.id || "";
 
   const getUserQuery = useGetUser(userId);
-  const createCourseMutation = useCreateCourse();
+  const router = useRouter();
 
   const firstName = useMemo(() => {
     if (getUserQuery.data?.name) {
@@ -32,15 +32,12 @@ export default function HomePage() {
   const [topic, setTopic] = useState("");
 
   const isLoading = sessionStatus === "loading" || getUserQuery.isLoading;
-  const isCreatingCourse = createCourseMutation.isPending;
 
-  const handleCreateCourse = () => {
+  const handleStartOnboarding = () => {
     if (!userId || !topic.trim()) return;
 
-    createCourseMutation.mutate({
-      userId,
-      originalPrompt: topic.trim(),
-    });
+    // Redirect to onboarding flow with the prompt
+    router.push(`/generate_course?prompt=${encodeURIComponent(topic.trim())}`);
   };
 
   if (isLoading) {
@@ -58,16 +55,6 @@ export default function HomePage() {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <HomeHeader />
 
-          {/* Loading Overlay for Course Creation */}
-          {isCreatingCourse && (
-            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center">
-              <div className="bg-card border border-border rounded p-8 mx-4 flex flex-col items-center gap-6 shadow-2xl max-w-md">
-                <Spinner className="size-12 text-primary" />
-                <p className="text-base sm:text-lg font-medium text-center text-foreground">Hold tight while your course generates...</p>
-              </div>
-            </div>
-          )}
-
           <main className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-24">
             <div className="w-full max-w-3xl flex flex-col items-center space-y-10 sm:space-y-8 md:space-y-10">
               <h1 className="text-3xl sm:text-4xl md:text-4xl font-medium text-center text-foreground max-w-4xl px-4">
@@ -77,8 +64,8 @@ export default function HomePage() {
               <CourseInput
                 topic={topic}
                 setTopic={setTopic}
-                isCreatingCourse={isCreatingCourse}
-                onSubmit={handleCreateCourse}
+                isCreatingCourse={false}
+                onSubmit={handleStartOnboarding}
               />
             </div>
           </main>

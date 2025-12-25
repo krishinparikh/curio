@@ -1,4 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
+import { onboardingSystemPrompt, onboardingUserPrompt } from "../prompts";
+import { OnboardingQuestion, OnboardingQuestionsResponseSchema } from "../schemas";
 
 export class OnboardingAgent {
   private model: ChatOpenAI;
@@ -11,11 +13,18 @@ export class OnboardingAgent {
     });
   }
 
-  // async generateQuestion() {
+  /**
+   * Generates a series of onboarding questions based on the user's original prompt
+   * Returns an array of questions with multiple choice options
+   */
+  async generateQuestions(originalPrompt: string): Promise<OnboardingQuestion[]> {
+    const structuredModel = this.model.withStructuredOutput(OnboardingQuestionsResponseSchema);
 
-  // }
+    const result = await structuredModel.invoke([
+      { role: "system", content: onboardingSystemPrompt() },
+      { role: "user", content: onboardingUserPrompt(originalPrompt) }
+    ]);
 
-  // synthesizeContext() {
-    
-  // }
+    return result.questions;
+  }
 }

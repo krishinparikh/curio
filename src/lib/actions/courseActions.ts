@@ -10,14 +10,13 @@ import { OnboardingContext } from '@/lib/schemas';
  *
  * Flow:
  * 1. Verify user exists
- * 2. Build OnboardingContext from originalPrompt
- * 3. Use CourseGenerationAgent to generate course structure
- * 4. Use ModuleGenerationAgent to generate content for each module concurrently
- * 5. Save course and modules to database in transaction
+ * 2. Use CourseGenerationAgent with OnboardingContext (prompt + answers)
+ * 3. Use ModuleGenerationAgent to generate content for each module concurrently
+ * 4. Save course and modules to database in transaction
  *
  * @throws Error if user not found
  */
-export async function createCourse(userId: string, originalPrompt: string) {
+export async function createCourse(userId: string, context: OnboardingContext) {
   // Verify user exists
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -26,9 +25,6 @@ export async function createCourse(userId: string, originalPrompt: string) {
   if (!user) {
     throw new Error('User not found');
   }
-
-  // Build onboarding context
-  const context: OnboardingContext = { originalPrompt };
 
   // Generate course structure using CourseGenerationAgent
   const courseAgent = new CourseGenerationAgent();
@@ -51,7 +47,7 @@ export async function createCourse(userId: string, originalPrompt: string) {
       userId,
       name: courseStructure.name,
       description: courseStructure.description,
-      originalPrompt,
+      originalPrompt: context.originalPrompt,
       modules: {
         create: modulesWithContent,
       },

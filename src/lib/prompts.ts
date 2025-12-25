@@ -1,5 +1,3 @@
-// ONBOARDING
-
 import { Course, OnboardingContext } from "./schemas";
 
 export function onboardingSystemPrompt(): string {
@@ -38,13 +36,20 @@ export function courseGenerationSystemPrompt(): string {
 }
 
 export function courseGenerationUserPrompt(onboardingContext: OnboardingContext): string {
-  return `Below is the learner's original prompt and additional information they provided about their course:
-  
-  """
-  ${onboardingContext.originalPrompt}
-  """
-  
-  Create a comprehensive course from this.`;
+  const hasAnswers = onboardingContext.answers && Object.keys(onboardingContext.answers).length > 0;
+
+  let prompt = `Below is the learner's original prompt:\n\n"""\n${onboardingContext.originalPrompt}\n"""\n`;
+
+  if (hasAnswers) {
+    prompt += `\nAdditional context from the learner:\n`;
+    for (const [question, answer] of Object.entries(onboardingContext.answers)) {
+      prompt += `\nQ: ${question}\nA: ${answer}\n`;
+    }
+  }
+
+  prompt += `\nCreate a comprehensive course from this.`;
+
+  return prompt;
 }
 
 

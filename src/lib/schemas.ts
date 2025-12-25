@@ -9,14 +9,15 @@ export const OnboardingQuestionSchema = z.object({
 
 export type OnboardingQuestion = z.infer<typeof OnboardingQuestionSchema>;
 
-
-// Shared context type
-export const OnboardingContextSchema = z.object ({
-  originalPrompt: z.string()
+export const OnboardingQuestionsResponseSchema = z.object({
+  questions: z.array(OnboardingQuestionSchema).min(3).max(5)
 });
 
-export type OnboardingContext = z.infer<typeof OnboardingContextSchema>;
 
+export interface OnboardingContext {
+  originalPrompt: string;
+  answers: Record<string, string>; // agent question and user answer
+}
 
 export const CourseSchema = z.object({
   name: z.string(),
