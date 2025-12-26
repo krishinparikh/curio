@@ -1,7 +1,8 @@
 'use server'
 
 import { OnboardingAgent } from '@/lib/course_generation/onboardingAgent';
-import { OnboardingQuestions } from '@/types/onboarding';
+import { OnboardingContext, OnboardingQuestions } from '@/types/onboarding';
+import { LLMInfoSynthesis } from '@/schemas/llm';
 
 /**
  * Generates onboarding questions based on the user's original prompt
@@ -22,4 +23,13 @@ export async function generateOnboardingQuestions(
   }));
 
   return onboardingQuestions;
+}
+
+export async function generateInfoSynthesis(
+  onboardingContext: OnboardingContext
+): Promise<LLMInfoSynthesis> {
+  const agent = new OnboardingAgent();
+  const synthesis = await agent.synthesizeInfo(onboardingContext);
+
+  return synthesis;
 }

@@ -2,12 +2,20 @@
 
 import { FormCard } from "./components/FormCard";
 import { RecapCard } from "./components/RecapCard";
-import { useGenerateQuestions, useCreateCourse } from "./hooks";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCreateCourse, useGenerateInfoSynthesis } from "./hooks";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Spinner } from "@/components/ui/spinner";
 import { OnboardingQuestions } from "@/types/onboarding";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { LLMInfoSynthesis } from "@/schemas/llm";
+import { useState } from "react";
+
+type OnboardingState = {
+  questions: OnboardingQuestions;
+  currentQuestionIndex: number;
+  isRecapScreen: boolean;
+};
 
 export default function GenerateCoursePage() {
   const searchParams = useSearchParams();
@@ -15,45 +23,24 @@ export default function GenerateCoursePage() {
   const { data: session } = useSession();
   const userId = session?.user?.id || '';
   const storageKey = `onboarding_${originalPrompt}`;
-  const { mutate: generateQuestions, isPending: isLoadingQuestions } = useGenerateQuestions();
   const { mutate: createCourse, isPending: isCreatingCourse } = useCreateCourse();
+  const { mutate: generateSynthesis, isPending: isGeneratingSynthesis } = useGenerateInfoSynthesis();
+  const router = useRouter();
+  const [infoSynthesis, setInfoSynthesis] = useState<LLMInfoSynthesis | null>(null);
 
-  const [questions, setQuestions] = useState<OnboardingQuestions>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isRecapScreen, setIsRecapScreen] = useState(false);
+  const [state, setState, clearStorage] = useLocalStorage<OnboardingState>(storageKey, {
+    questions: [],
+    currentQuestionIndex: 0,
+    isRecapScreen: false,
+  });
 
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (questions.length > 0) {
-      localStorage.setItem(storageKey, JSON.stringify({ questions, currentQuestionIndex, isRecapScreen }));
-    }
-  }, [questions, currentQuestionIndex, isRecapScreen, storageKey]);
+  const { questions, currentQuestionIndex, isRecapScreen } = state;
 
-  // Load saved state from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      try {
-        const savedData = JSON.parse(saved);
-        setQuestions(savedData.questions || []);
-        setCurrentQuestionIndex(savedData.currentQuestionIndex || 0);
-        setIsRecapScreen(savedData.isRecapScreen || false);
-      } catch (e) {
-        console.error('Failed to load onboarding state:', e);
-      }
-    }
-  }, [storageKey]);
-
-  // Generate questions on mount
-  useEffect(() => {
-    if (originalPrompt && questions.length === 0) {
-      generateQuestions(originalPrompt, {
-        onSuccess: (generatedQuestions) => {
-          setQuestions(generatedQuestions);
-        },
-      });
-    }
-  }, [originalPrompt, questions.length, generateQuestions]);
+  // Redirect back to home if no questions exist (shouldn't happen in normal flow)
+  if (!originalPrompt || questions.length === 0) {
+    router.push('/home');
+    return null;
+  }
 
   const handleSelectOption = (optionIndex: number) => {
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
@@ -66,14 +53,32 @@ export default function GenerateCoursePage() {
       customAnswer: selectedOption,
     };
 
-    setQuestions(updatedQuestions);
+    setState(prev => ({ ...prev, questions: updatedQuestions }));
 
     // Auto-advance after selecting an option
     setTimeout(() => {
       if (isLastQuestion) {
-        setIsRecapScreen(true);
+        // Transition to recap screen and trigger synthesis
+        setState(prev => ({ ...prev, isRecapScreen: true }));
+
+        // Generate info synthesis
+        const answers: Record<string, string> = {};
+        updatedQuestions.forEach(q => {
+          if (q.customAnswer) {
+            answers[q.question] = q.customAnswer;
+          }
+        });
+
+        generateSynthesis({
+          originalPrompt,
+          responses: answers,
+        }, {
+          onSuccess: (synthesis) => {
+            setInfoSynthesis(synthesis);
+          },
+        });
       } else {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setState(prev => ({ ...prev, currentQuestionIndex: prev.currentQuestionIndex + 1 }));
       }
     }, 500);
   };
@@ -82,62 +87,69 @@ export default function GenerateCoursePage() {
     const updatedQuestions = [...questions];
     updatedQuestions[currentQuestionIndex] = {
       ...updatedQuestions[currentQuestionIndex],
-      selectedOptionIndex: null,
+      selectedOptionIndex: answer ? null : updatedQuestions[currentQuestionIndex].selectedOptionIndex,
       customAnswer: answer,
     };
 
-    setQuestions(updatedQuestions);
+    setState(prev => ({ ...prev, questions: updatedQuestions }));
   };
 
   const handleNavigatePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setState(prev => ({ ...prev, currentQuestionIndex: prev.currentQuestionIndex - 1 }));
     }
   };
 
   const handleNavigateNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+    if (isLastQuestion) {
+      // Transition to recap screen and trigger synthesis
+      setState(prev => ({ ...prev, isRecapScreen: true }));
+
+      // Generate info synthesis
+      const answers: Record<string, string> = {};
+      questions.forEach(q => {
+        if (q.customAnswer) {
+          answers[q.question] = q.customAnswer;
+        }
+      });
+
+      generateSynthesis({
+        originalPrompt,
+        responses: answers,
+      }, {
+        onSuccess: (synthesis) => {
+          setInfoSynthesis(synthesis);
+        },
+      });
+    } else {
+      setState(prev => ({ ...prev, currentQuestionIndex: prev.currentQuestionIndex + 1 }));
     }
   };
 
   const handleGoBack = () => {
-    setIsRecapScreen(false);
-    setCurrentQuestionIndex(questions.length - 1);
+    setState(prev => ({
+      ...prev,
+      isRecapScreen: false,
+      currentQuestionIndex: questions.length - 1,
+    }));
+    setInfoSynthesis(null);
   };
 
   const handleGenerateCourse = () => {
-    if (!userId) return;
-
-    // Convert questions with answers to answers object
-    const answers: Record<string, string> = {};
-    questions.forEach(q => {
-      if (q.customAnswer) {
-        answers[q.question] = q.customAnswer;
-      }
-    });
+    if (!userId || !infoSynthesis) return;
 
     createCourse({
       userId,
-      onboardingContext: {
-        originalPrompt,
-        responses: answers,
-      },
+      infoSynthesis,
     }, {
       onSuccess: () => {
         // Clear localStorage after successful course creation
-        localStorage.removeItem(storageKey);
+        clearStorage();
       },
     });
   };
-
-  if (isLoadingQuestions || questions.length === 0) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <p>Let me ask you a few more questions to clarify your goals...</p>
-      </div>
-    );
-  }
 
   if (isRecapScreen) {
     return (
@@ -153,15 +165,11 @@ export default function GenerateCoursePage() {
         )}
 
         <RecapCard
-          courseName={originalPrompt}
-          courseDescription="A comprehensive introduction to the most popular frontend library, focusing on JSX, components, and state."
-          answers={questions.reduce((acc, q) => {
-            if (q.customAnswer) acc[q.question] = q.customAnswer;
-            return acc;
-          }, {} as Record<string, string>)}
+          infoSynthesis={infoSynthesis}
           onGenerateCourse={handleGenerateCourse}
           onGoBack={handleGoBack}
           isGenerating={isCreatingCourse}
+          isLoadingSynthesis={isGeneratingSynthesis}
         />
       </div>
     );

@@ -7,6 +7,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useGetUser } from "@/hooks/useGetUser";
 import { CourseInput } from "./components/course_input/CourseInput";
 import { useRouter } from "next/navigation";
+import { useGenerateQuestions } from "@/app/generate_course/hooks";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { OnboardingQuestions } from "@/types/onboarding";
+
+type OnboardingState = {
+  questions: OnboardingQuestions;
+  currentQuestionIndex: number;
+  isRecapScreen: boolean;
+};
 
 export default function HomePage() {
   const { data: session, status: sessionStatus } = useSession();
@@ -15,6 +24,7 @@ export default function HomePage() {
 
   const getUserQuery = useGetUser(userId);
   const router = useRouter();
+  const { mutate: generateQuestions, isPending: isGeneratingQuestions } = useGenerateQuestions();
 
   const firstName = useMemo(() => {
     if (getUserQuery.data?.name) {
@@ -36,8 +46,24 @@ export default function HomePage() {
   const handleStartOnboarding = () => {
     if (!userId || !topic.trim()) return;
 
-    // Redirect to onboarding flow with the prompt
-    router.push(`/generate_course?prompt=${encodeURIComponent(topic.trim())}`);
+    const trimmedTopic = topic.trim();
+    const storageKey = `onboarding_${trimmedTopic}`;
+
+    // Generate questions first
+    generateQuestions(trimmedTopic, {
+      onSuccess: (generatedQuestions) => {
+        // Save to localStorage
+        const initialState: OnboardingState = {
+          questions: generatedQuestions,
+          currentQuestionIndex: 0,
+          isRecapScreen: false,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(initialState));
+
+        // Then navigate
+        router.push(`/generate_course?prompt=${encodeURIComponent(trimmedTopic)}`);
+      },
+    });
   };
 
   if (isLoading) {
@@ -64,7 +90,7 @@ export default function HomePage() {
               <CourseInput
                 topic={topic}
                 setTopic={setTopic}
-                isCreatingCourse={false}
+                isCreatingCourse={isGeneratingQuestions}
                 onSubmit={handleStartOnboarding}
               />
             </div>

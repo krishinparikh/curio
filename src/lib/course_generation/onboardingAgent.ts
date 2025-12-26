@@ -1,6 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { onboardingSystemPrompt, onboardingUserPrompt } from "../prompts";
-import { LLMOnboarding, LLMOnboardingSchema } from "@/schemas/llm";
+import { onboardingSystemPrompt, onboardingUserPrompt, infoSynthesisSystemPrompt, infoSynthesisUserPrompt } from "../prompts";
+import { LLMOnboarding, LLMOnboardingSchema, LLMInfoSynthesis, LLMInfoSynthesisSchema } from "@/schemas/llm";
+import { OnboardingContext } from "@/types/onboarding";
 
 export class OnboardingAgent {
   private model: ChatOpenAI;
@@ -25,5 +26,16 @@ export class OnboardingAgent {
     ]);
 
     return result.questions;
+  }
+
+  async synthesizeInfo(onboardingContext: OnboardingContext): Promise<LLMInfoSynthesis> {
+    const structuredModel = this.model.withStructuredOutput(LLMInfoSynthesisSchema);
+
+    const result = await structuredModel.invoke([
+      { role: "system", content: infoSynthesisSystemPrompt() },
+      { role: "system", content: infoSynthesisUserPrompt(onboardingContext) },
+    ])
+    
+    return result;
   }
 }

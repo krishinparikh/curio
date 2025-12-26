@@ -45,7 +45,7 @@ export function FormCard({
           {Array.from({ length: onboardingQuestions.length }).map((_, index) => (
             <span
               className={
-                index < currentQuestionIndex
+                index < currentQuestionIndex + 1
                   ? "bg-primary w-2 h-2 rounded"
                   : "bg-border w-2 h-2 rounded"
               }
@@ -55,7 +55,7 @@ export function FormCard({
         </div>
 
         <Button
-          disabled={isLastQuestion || !onNavigateNext}
+          disabled={!onNavigateNext}
           variant="ghost"
           size="sm"
           onClick={onNavigateNext}
@@ -73,6 +73,7 @@ export function FormCard({
               variant={selectedOptionIndex === index ? "default" : "outline"}
               key={index}
               onClick={() => onSelectOption(index)}
+              className="transition-none"
             >
               {option}
             </Button>

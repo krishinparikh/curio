@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { generateOnboardingQuestions } from '@/lib/actions/onboardingActions';
+import { generateOnboardingQuestions, generateInfoSynthesis } from '@/lib/actions/onboardingActions';
 import { createCourse } from '@/lib/actions/courseActions';
 import { OnboardingQuestions, OnboardingContext } from '@/types/onboarding';
+import { LLMInfoSynthesis } from '@/schemas/llm';
 import { useRouter } from 'next/navigation';
 
 /**
@@ -16,15 +17,32 @@ export function useGenerateQuestions() {
 }
 
 /**
- * Hook to create a course with onboarding context
+ * Hook to generate info synthesis from onboarding context
+ */
+export function useGenerateInfoSynthesis() {
+  return useMutation({
+    mutationFn: async (onboardingContext: OnboardingContext): Promise<LLMInfoSynthesis> => {
+      return generateInfoSynthesis(onboardingContext);
+    },
+  });
+}
+
+/**
+ * Hook to create a course with info synthesis
  */
 export function useCreateCourse() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, onboardingContext }: { userId: string; onboardingContext: OnboardingContext }) => {
-      return createCourse(userId, onboardingContext);
+    mutationFn: async ({
+      userId,
+      infoSynthesis
+    }: {
+      userId: string;
+      infoSynthesis: LLMInfoSynthesis;
+    }) => {
+      return createCourse(userId, infoSynthesis);
     },
     onSuccess: (course, variables) => {
       // Invalidate courses query to refresh the list

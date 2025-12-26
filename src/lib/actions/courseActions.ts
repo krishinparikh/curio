@@ -3,20 +3,20 @@
 import { prisma } from '@/lib/prisma/db';
 import { CourseGenerationAgent } from '@/lib/course_generation/courseGenerationAgent';
 import { ModuleGenerationAgent } from '@/lib/course_generation/moduleGenerationAgent';
-import { OnboardingContext } from '@/types/onboarding';
+import { LLMInfoSynthesis } from '@/schemas/llm';
 
 /**
  * Creates a new course with AI-generated modules
  *
  * Flow:
  * 1. Verify user exists
- * 2. Use CourseGenerationAgent with OnboardingContext (prompt + answers)
+ * 2. Use CourseGenerationAgent with LLMInfoSynthesis
  * 3. Use ModuleGenerationAgent to generate content for each module concurrently
  * 4. Save course and modules to database in transaction
  *
  * @throws Error if user not found
  */
-export async function createCourse(userId: string, onboardingContext: OnboardingContext) {
+export async function createCourse(userId: string, infoSynthesis: LLMInfoSynthesis) {
   // Verify user exists
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -28,7 +28,7 @@ export async function createCourse(userId: string, onboardingContext: Onboarding
 
   // Generate course structure using CourseGenerationAgent
   const courseAgent = new CourseGenerationAgent();
-  const courseStructure = await courseAgent.generateCourse(onboardingContext);
+  const courseStructure = await courseAgent.generateCourse(infoSynthesis);
 
   // Generate all module content concurrently using ModuleGenerationAgent
   const moduleAgent = new ModuleGenerationAgent();
@@ -47,7 +47,7 @@ export async function createCourse(userId: string, onboardingContext: Onboarding
       userId,
       name: courseStructure.name,
       description: courseStructure.description,
-      originalPrompt: onboardingContext.originalPrompt,
+      originalPrompt: infoSynthesis.topic,
       modules: {
         create: modulesWithContent,
       },

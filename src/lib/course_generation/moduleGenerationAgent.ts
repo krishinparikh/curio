@@ -7,8 +7,8 @@ export class ModuleGenerationAgent {
 
   constructor() {
     this.model = new ChatOpenAI({
-      modelName: "gpt-5-mini",
-      // temperature: 0.7,
+      modelName: "gpt-4o-mini",
+      temperature: 0.7,
     });
   }
 

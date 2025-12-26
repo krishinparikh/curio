@@ -11,14 +11,25 @@ export const LLMOnboardingSchema = z.object({
 
 export type LLMOnboarding = z.infer<typeof LLMOnboardingSchema>;
 
+// Synthsis of information that is passed to the CourseGenerationAgent
+export const LLMInfoSynthesisSchema = z.object({
+  topic: z.string(),
+  goal: z.string(),
+  currentLevel: z.array(z.string()).min(1).max(4),
+  additionalConext: z.array(z.string())
+});
+
+export type LLMInfoSynthesis = z.infer<typeof LLMInfoSynthesisSchema>;
+
 // Course
 export const LLMCourseSchema = z.object({
   name: z.string(),
   description: z.string(),
   modules: z.array(z.object({
     name: z.string(),
-    overview: z.string()
-  })).min(3).max(9)
+    overview: z.string(),
+    topics: z.array(z.string()).min(2).max(4)
+  })).min(3).max(6)
 })
 
 export type LLMCourse = z.infer<typeof LLMCourseSchema>;

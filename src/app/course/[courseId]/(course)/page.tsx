@@ -54,8 +54,18 @@ export default function CoursePage({ params }: CoursePageProps) {
     );
   }
 
-  if (!courseData) {
+  // Only call notFound if query has completed and still no data
+  if (getCourseQuery.isSuccess && !courseData) {
     notFound();
+  }
+
+  // Show spinner if data not yet available (query disabled or still fetching)
+  if (!courseData) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner className="size-12" />
+      </div>
+    );
   }
 
   const { course, totalModules, completedModules, inferredLength } = courseData;
