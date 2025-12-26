@@ -1,5 +1,5 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { Course, Module } from "../schemas";
+import { LLMCourse } from "@/schemas/llm";
 import { moduleGenerationSystemPrompt, moduleGenerationUserPrompt } from "../prompts";
 
 export class ModuleGenerationAgent {
@@ -12,7 +12,7 @@ export class ModuleGenerationAgent {
     });
   }
 
-  async generateModuleContent(course: Course, index: number): Promise<string> {
+  async generateModuleContent(course: LLMCourse, index: number): Promise<string> {
     const result = await this.model.invoke([
       { role: "system", content: moduleGenerationSystemPrompt() },
       { role: "user", content: moduleGenerationUserPrompt(course, index) }

@@ -4,64 +4,118 @@ import { FormCard } from "./components/FormCard";
 import { RecapCard } from "./components/RecapCard";
 import { useGenerateQuestions, useCreateCourse } from "./hooks";
 import { useState, useEffect } from "react";
-import { OnboardingQuestion } from "@/lib/schemas";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Spinner } from "@/components/ui/spinner";
+import { OnboardingQuestions } from "@/types/onboarding";
 
 export default function GenerateCoursePage() {
   const searchParams = useSearchParams();
   const originalPrompt = searchParams.get('prompt') || '';
   const { data: session } = useSession();
   const userId = session?.user?.id || '';
-
-  const [currentStep, setCurrentStep] = useState(0);
-  const [questions, setQuestions] = useState<OnboardingQuestion[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [isRecapScreen, setIsRecapScreen] = useState(false);
-
+  const storageKey = `onboarding_${originalPrompt}`;
   const { mutate: generateQuestions, isPending: isLoadingQuestions } = useGenerateQuestions();
   const { mutate: createCourse, isPending: isCreatingCourse } = useCreateCourse();
 
+  const [questions, setQuestions] = useState<OnboardingQuestions>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isRecapScreen, setIsRecapScreen] = useState(false);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (questions.length > 0) {
+      localStorage.setItem(storageKey, JSON.stringify({ questions, currentQuestionIndex, isRecapScreen }));
+    }
+  }, [questions, currentQuestionIndex, isRecapScreen, storageKey]);
+
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const savedData = JSON.parse(saved);
+        setQuestions(savedData.questions || []);
+        setCurrentQuestionIndex(savedData.currentQuestionIndex || 0);
+        setIsRecapScreen(savedData.isRecapScreen || false);
+      } catch (e) {
+        console.error('Failed to load onboarding state:', e);
+      }
+    }
+  }, [storageKey]);
+
   // Generate questions on mount
   useEffect(() => {
-    if (originalPrompt) {
+    if (originalPrompt && questions.length === 0) {
       generateQuestions(originalPrompt, {
         onSuccess: (generatedQuestions) => {
           setQuestions(generatedQuestions);
         },
       });
     }
-  }, [originalPrompt]);
+  }, [originalPrompt, questions.length, generateQuestions]);
 
   const handleNext = (answer: string) => {
-    const currentQuestion = questions[currentStep];
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.question]: answer,
-    }));
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
+    const currentQ = questions[currentQuestionIndex];
 
-    // Check if this was the last question
-    if (currentStep === questions.length - 1) {
+    // Check if answer matches one of the options
+    const selectedIndex = currentQ.options.indexOf(answer);
+
+    const updatedQuestions = [...questions];
+    updatedQuestions[currentQuestionIndex] = {
+      ...updatedQuestions[currentQuestionIndex],
+      selectedOptionIndex: selectedIndex >= 0 ? selectedIndex : null,
+      customAnswer: answer,
+    };
+
+    setQuestions(updatedQuestions);
+
+    if (isLastQuestion) {
       setIsRecapScreen(true);
     } else {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handleNavigatePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleNavigateNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handleGoBack = () => {
     setIsRecapScreen(false);
-    setCurrentStep(questions.length - 1);
+    setCurrentQuestionIndex(questions.length - 1);
   };
 
   const handleGenerateCourse = () => {
     if (!userId) return;
 
+    // Convert questions with answers to answers object
+    const answers: Record<string, string> = {};
+    questions.forEach(q => {
+      if (q.customAnswer) {
+        answers[q.question] = q.customAnswer;
+      }
+    });
+
     createCourse({
       userId,
       context: {
         originalPrompt,
-        answers,
+        responses: answers,
+      },
+    }, {
+      onSuccess: () => {
+        // Clear localStorage after successful course creation
+        localStorage.removeItem(storageKey);
       },
     });
   };
@@ -69,7 +123,7 @@ export default function GenerateCoursePage() {
   if (isLoadingQuestions || questions.length === 0) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <p>Loading questions...</p>
+        <p>Let me ask you a few more questions to clarify your goals...</p>
       </div>
     );
   }
@@ -90,7 +144,10 @@ export default function GenerateCoursePage() {
         <RecapCard
           courseName={originalPrompt}
           courseDescription="A comprehensive introduction to the most popular frontend library, focusing on JSX, components, and state."
-          answers={answers}
+          answers={questions.reduce((acc, q) => {
+            if (q.customAnswer) acc[q.question] = q.customAnswer;
+            return acc;
+          }, {} as Record<string, string>)}
           onGenerateCourse={handleGenerateCourse}
           onGoBack={handleGoBack}
           isGenerating={isCreatingCourse}
@@ -99,17 +156,14 @@ export default function GenerateCoursePage() {
     );
   }
 
-  const currentQuestion = questions[currentStep];
-
   return (
     <div className="min-h-screen flex justify-center items-center">
       <FormCard
-        question={currentQuestion.question}
-        options={currentQuestion.options}
-        allowCustom={currentQuestion.allowCustom}
-        totalQuestions={questions.length}
-        currentQuestion={currentStep + 1}
+        onboardingQuestions={questions}
+        currentQuestionIndex={currentQuestionIndex}
         onNext={handleNext}
+        onNavigatePrevious={handleNavigatePrevious}
+        onNavigateNext={handleNavigateNext}
       />
     </div>
   );

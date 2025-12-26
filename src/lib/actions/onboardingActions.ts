@@ -1,7 +1,7 @@
 'use server'
 
 import { OnboardingAgent } from '@/lib/course_generation/onboardingAgent';
-import { OnboardingQuestion } from '@/lib/schemas';
+import { OnboardingQuestions } from '@/types/onboarding';
 
 /**
  * Generates onboarding questions based on the user's original prompt
@@ -9,7 +9,17 @@ import { OnboardingQuestion } from '@/lib/schemas';
  */
 export async function generateOnboardingQuestions(
   originalPrompt: string
-): Promise<OnboardingQuestion[]> {
+): Promise<OnboardingQuestions> {
   const agent = new OnboardingAgent();
-  return agent.generateQuestions(originalPrompt);
+  const agentResult = await agent.generateQuestions(originalPrompt);
+
+  // Map LLMOnboarding to OnboardingQuestions
+  const onboardingQuestions: OnboardingQuestions = agentResult.map(item => ({
+    question: item.question,
+    options: item.options,
+    selectedOptionIndex: null,
+    customAnswer: null
+  }));
+
+  return onboardingQuestions;
 }

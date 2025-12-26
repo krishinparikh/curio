@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma/db';
 import { CourseGenerationAgent } from '@/lib/course_generation/courseGenerationAgent';
 import { ModuleGenerationAgent } from '@/lib/course_generation/moduleGenerationAgent';
-import { OnboardingContext } from '@/lib/schemas';
+import { OnboardingContext } from '@/types/onboarding';
 
 /**
  * Creates a new course with AI-generated modules

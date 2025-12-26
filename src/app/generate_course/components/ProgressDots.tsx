@@ -4,23 +4,35 @@ import { Button } from '@/components/ui/button';
 interface ProgressDotsProps {
   numQuestions: number;
   currentQuestionNum: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
 }
 
 export function ProgressDots({
   numQuestions,
-  currentQuestionNum
+  currentQuestionNum,
+  onPrevious,
+  onNext
 }: ProgressDotsProps) {
+
+  const isFirstQuestion = currentQuestionNum === 1;
+  const isLastQuestion = currentQuestionNum === numQuestions;
 
   return (
 
     <div className="flex items-center justify-between w-full">
 
-      <Button disabled={true} variant="ghost" size="sm">
+      <Button
+        disabled={isFirstQuestion || !onPrevious}
+        variant="ghost"
+        size="sm"
+        onClick={onPrevious}
+      >
         <ChevronLeft />
       </Button>
 
       <div className="flex gap-4 justify-center">
-        
+
         {
           Array.from({length: numQuestions}).map((_, index) => (
             <span className={
@@ -29,10 +41,15 @@ export function ProgressDots({
               "bg-border w-2 h-2 rounded"
             } key={index} />
           ))
-        }   
+        }
       </div>
 
-      <Button variant="ghost" size="sm">
+      <Button
+        disabled={isLastQuestion || !onNext}
+        variant="ghost"
+        size="sm"
+        onClick={onNext}
+      >
         <ChevronRight />
       </Button>
     </div>

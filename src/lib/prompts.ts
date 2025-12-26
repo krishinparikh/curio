@@ -1,4 +1,5 @@
-import { Course, OnboardingContext } from "./schemas";
+import { OnboardingContext } from "@/types/onboarding";
+import { LLMCourse } from "@/schemas/llm"; 
 
 export function onboardingSystemPrompt(): string {
   return `You are a world-class personal teacher. A user will request some topic they want to learn; your job is to ask clarifying questions to inform how to create the best possible course for them.
@@ -36,15 +37,16 @@ export function courseGenerationSystemPrompt(): string {
 }
 
 export function courseGenerationUserPrompt(onboardingContext: OnboardingContext): string {
-  const hasAnswers = onboardingContext.answers && Object.keys(onboardingContext.answers).length > 0;
+  const hasResponses = Object.keys(onboardingContext.responses).length > 0;
 
   let prompt = `Below is the learner's original prompt:\n\n"""\n${onboardingContext.originalPrompt}\n"""\n`;
 
-  if (hasAnswers) {
+  if (hasResponses) {
     prompt += `\nAdditional context from the learner:\n`;
-    for (const [question, answer] of Object.entries(onboardingContext.answers)) {
+    
+    Object.entries(onboardingContext.responses).forEach(([question, answer]) => {
       prompt += `\nQ: ${question}\nA: ${answer}\n`;
-    }
+    })
   }
 
   prompt += `\nCreate a comprehensive course from this.`;
@@ -61,7 +63,7 @@ export function moduleGenerationSystemPrompt(): string {
   Return only the educational content in markdown format with headings, code examples, and formatting as appropriate. Do NOT write an h1 title ("# Title") — only h2s and below.`;
 }
 
-export function moduleGenerationUserPrompt(course: Course, index: number): string {
+export function moduleGenerationUserPrompt(course: LLMCourse, index: number): string {
   return `Write comprehensive educational content for this module:
 
   Module: ${course.modules[index].name}

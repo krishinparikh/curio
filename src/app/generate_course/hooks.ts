@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { generateOnboardingQuestions } from '@/lib/actions/onboardingActions';
 import { createCourse } from '@/lib/actions/courseActions';
-import { OnboardingQuestion, OnboardingContext } from '@/lib/schemas';
+import { OnboardingQuestions, OnboardingContext } from '@/types/onboarding';
 import { useRouter } from 'next/navigation';
 
 /**
@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
  */
 export function useGenerateQuestions() {
   return useMutation({
-    mutationFn: async (originalPrompt: string): Promise<OnboardingQuestion[]> => {
+    mutationFn: async (originalPrompt: string): Promise<OnboardingQuestions> => {
       return generateOnboardingQuestions(originalPrompt);
     },
   });
