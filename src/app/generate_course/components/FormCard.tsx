@@ -2,15 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ProgressDots } from "./ProgressDots";
 import { RootCard } from "./RootCard";
-import { useState, useEffect } from "react";
 import { OnboardingQuestions } from "@/types/onboarding";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type FormCardProps = {
   onboardingQuestions: OnboardingQuestions;
   currentQuestionIndex: number;
-  onNext: (answer: string) => void;
+  onSelectOption: (optionIndex: number) => void;
+  onCustomAnswer: (answer: string) => void;
   onNavigateNext?: () => void;
   onNavigatePrevious?: () => void;
 }
@@ -18,43 +18,51 @@ type FormCardProps = {
 export function FormCard({
   onboardingQuestions,
   currentQuestionIndex,
-  onNext,
+  onSelectOption,
+  onCustomAnswer,
   onNavigateNext,
   onNavigatePrevious,
 }: FormCardProps) {
   const currentQuestion = onboardingQuestions[currentQuestionIndex];
-  const { question, options, selectedOptionIndex, customAnswer: initialCustomAnswer } = currentQuestion;
+  const { question, options, selectedOptionIndex, customAnswer } = currentQuestion;
 
-  const [buttonSelected, setButtonSelected] = useState<number | null>(selectedOptionIndex ?? null);
-  const [customAnswer, setCustomAnswer] = useState(initialCustomAnswer || "");
-
-  // Reset state when question changes (navigating between questions)
-  useEffect(() => {
-    setButtonSelected(currentQuestion.selectedOptionIndex ?? null);
-    setCustomAnswer(currentQuestion.customAnswer || "");
-  }, [currentQuestionIndex, currentQuestion.selectedOptionIndex, currentQuestion.customAnswer]);
-
-  // Auto-advance after selecting an option
-  useEffect(() => {
-    if (buttonSelected !== null) {
-      const timer = setTimeout(() => {
-        onNext(options[buttonSelected]);
-        setButtonSelected(null);
-        setCustomAnswer("");
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [buttonSelected, options, onNext]);
+  const isFirstQuestion = currentQuestionIndex === 0;
+  const isLastQuestion = currentQuestionIndex === onboardingQuestions.length - 1;
 
   return (
     <RootCard>
-      <ProgressDots
-        numQuestions={onboardingQuestions.length}
-        currentQuestionNum={currentQuestionIndex}
-        onPrevious={onNavigatePrevious}
-        onNext={onNavigateNext}
-      />
+      <div className="flex items-center justify-between w-full">
+        <Button
+          disabled={isFirstQuestion || !onNavigatePrevious}
+          variant="ghost"
+          size="sm"
+          onClick={onNavigatePrevious}
+        >
+          <ChevronLeft />
+        </Button>
+
+        <div className="flex gap-4 justify-center">
+          {Array.from({ length: onboardingQuestions.length }).map((_, index) => (
+            <span
+              className={
+                index < currentQuestionIndex
+                  ? "bg-primary w-2 h-2 rounded"
+                  : "bg-border w-2 h-2 rounded"
+              }
+              key={index}
+            />
+          ))}
+        </div>
+
+        <Button
+          disabled={isLastQuestion || !onNavigateNext}
+          variant="ghost"
+          size="sm"
+          onClick={onNavigateNext}
+        >
+          <ChevronRight />
+        </Button>
+      </div>
 
       <p className="text-lg">{question}</p>
 
@@ -62,12 +70,9 @@ export function FormCard({
         <div className="grid grid-cols-2 gap-2 w-full">
           {options.map((option, index) => (
             <Button
-              variant={buttonSelected === index ? "default" : "outline"}
+              variant={selectedOptionIndex === index ? "default" : "outline"}
               key={index}
-              onClick={() => {
-                setButtonSelected(index);
-                setCustomAnswer("");
-              }}
+              onClick={() => onSelectOption(index)}
             >
               {option}
             </Button>
@@ -77,11 +82,8 @@ export function FormCard({
         <Input
           placeholder="Write a custom answer"
           className="bg-card"
-          value={customAnswer}
-          onChange={(e) => {
-            setCustomAnswer(e.target.value);
-            setButtonSelected(null);
-          }}
+          value={customAnswer || ""}
+          onChange={(e) => onCustomAnswer(e.target.value)}
         />
       </div>
     </RootCard>

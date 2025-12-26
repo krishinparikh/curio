@@ -55,27 +55,38 @@ export default function GenerateCoursePage() {
     }
   }, [originalPrompt, questions.length, generateQuestions]);
 
-  const handleNext = (answer: string) => {
+  const handleSelectOption = (optionIndex: number) => {
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
-    const currentQ = questions[currentQuestionIndex];
-
-    // Check if answer matches one of the options
-    const selectedIndex = currentQ.options.indexOf(answer);
+    const selectedOption = questions[currentQuestionIndex].options[optionIndex];
 
     const updatedQuestions = [...questions];
     updatedQuestions[currentQuestionIndex] = {
       ...updatedQuestions[currentQuestionIndex],
-      selectedOptionIndex: selectedIndex >= 0 ? selectedIndex : null,
-      customAnswer: answer,
+      selectedOptionIndex: optionIndex,
+      customAnswer: selectedOption,
     };
 
     setQuestions(updatedQuestions);
 
-    if (isLastQuestion) {
-      setIsRecapScreen(true);
-    } else {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
+    // Auto-advance after selecting an option
+    setTimeout(() => {
+      if (isLastQuestion) {
+        setIsRecapScreen(true);
+      } else {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      }
+    }, 500);
+  };
+
+  const handleCustomAnswer = (answer: string) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[currentQuestionIndex] = {
+      ...updatedQuestions[currentQuestionIndex],
+      selectedOptionIndex: null,
+      customAnswer: answer,
+    };
+
+    setQuestions(updatedQuestions);
   };
 
   const handleNavigatePrevious = () => {
@@ -108,7 +119,7 @@ export default function GenerateCoursePage() {
 
     createCourse({
       userId,
-      context: {
+      onboardingContext: {
         originalPrompt,
         responses: answers,
       },
@@ -161,7 +172,8 @@ export default function GenerateCoursePage() {
       <FormCard
         onboardingQuestions={questions}
         currentQuestionIndex={currentQuestionIndex}
-        onNext={handleNext}
+        onSelectOption={handleSelectOption}
+        onCustomAnswer={handleCustomAnswer}
         onNavigatePrevious={handleNavigatePrevious}
         onNavigateNext={handleNavigateNext}
       />

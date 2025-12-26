@@ -23,8 +23,8 @@ export function useCreateCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, context }: { userId: string; context: OnboardingContext }) => {
-      return createCourse(userId, context);
+    mutationFn: async ({ userId, onboardingContext }: { userId: string; onboardingContext: OnboardingContext }) => {
+      return createCourse(userId, onboardingContext);
     },
     onSuccess: (course, variables) => {
       // Invalidate courses query to refresh the list

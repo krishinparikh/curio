@@ -16,7 +16,7 @@ import { OnboardingContext } from '@/types/onboarding';
  *
  * @throws Error if user not found
  */
-export async function createCourse(userId: string, context: OnboardingContext) {
+export async function createCourse(userId: string, onboardingContext: OnboardingContext) {
   // Verify user exists
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -28,7 +28,7 @@ export async function createCourse(userId: string, context: OnboardingContext) {
 
   // Generate course structure using CourseGenerationAgent
   const courseAgent = new CourseGenerationAgent();
-  const courseStructure = await courseAgent.generateCourse(context);
+  const courseStructure = await courseAgent.generateCourse(onboardingContext);
 
   // Generate all module content concurrently using ModuleGenerationAgent
   const moduleAgent = new ModuleGenerationAgent();
@@ -47,7 +47,7 @@ export async function createCourse(userId: string, context: OnboardingContext) {
       userId,
       name: courseStructure.name,
       description: courseStructure.description,
-      originalPrompt: context.originalPrompt,
+      originalPrompt: onboardingContext.originalPrompt,
       modules: {
         create: modulesWithContent,
       },

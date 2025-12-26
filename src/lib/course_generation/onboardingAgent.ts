@@ -16,7 +16,7 @@ export class OnboardingAgent {
    * Generates a series of onboarding questions based on the user's original prompt
    * Returns an array of questions with multiple choice options
    */
-  async generateQuestions(originalPrompt: string): Promise<LLMOnboarding> {
+  async generateQuestions(originalPrompt: string): Promise<LLMOnboarding["questions"]> {
     const structuredModel = this.model.withStructuredOutput(LLMOnboardingSchema);
 
     const result = await structuredModel.invoke([
@@ -24,6 +24,6 @@ export class OnboardingAgent {
       { role: "user", content: onboardingUserPrompt(originalPrompt) }
     ]);
 
-    return result;
+    return result.questions;
   }
 }

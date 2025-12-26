@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 // Onboarding questions and their options
-export const LLMOnboardingSchema = z.array(z.object({
-  question: z.string(),
-  options: z.array(z.string()).min(2).max(4)
-})).min(3).max(5);
+// Note: Top-level must be object for OpenAI structured output API
+export const LLMOnboardingSchema = z.object({
+  questions: z.array(z.object({
+    question: z.string(),
+    options: z.array(z.string()).min(2).max(4)
+  })).min(3).max(5)
+});
 
 export type LLMOnboarding = z.infer<typeof LLMOnboardingSchema>;
 
