@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -63,7 +62,7 @@ export default function MarkdownRenderer({ children }: MarkdownRendererProps) {
   return (
     <Markdown
       remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeRaw, rehypeKatex]}
+      rehypePlugins={[rehypeKatex]}
       components={markdownComponents}
     >
       {processedContent}

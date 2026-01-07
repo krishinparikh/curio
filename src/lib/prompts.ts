@@ -109,7 +109,7 @@ export function moduleGenerationSystemPrompt(): string {
   ## Key Takeaways
   [- Bullet points]
   
-  Be extremely succinct and clear. Use practical real-world examples. Use analogies if opportune, but don't force it. Avoid difficult phrases/words.
+  Be extremely succinct and clear. Use practical real-world examples. Use analogies if opportune, but don't force it. Avoid difficult phrases/words. If helpful, you can generate structured Markdown formats, such as code snippets, inline/display math, tables, lists, and emphases.
 
   Return only the educational content in the format above.`;
 }

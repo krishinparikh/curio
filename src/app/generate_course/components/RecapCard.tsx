@@ -34,34 +34,17 @@ export function RecapCard({
   return (
     <RootCard>
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">{infoSynthesis.topic}</h2>
-        <p className="text-muted-foreground">{infoSynthesis.goal}</p>
-      </div>
+        <p className="text-lg">{infoSynthesis.topic}</p>
 
-      <div className="space-y-3">
-        <div>
-          <p className="text-sm font-semibold mb-2">Your Current Level:</p>
-          <ul className="list-disc list-inside space-y-1">
-            {infoSynthesis.currentLevel.map((level, index) => (
-              <li key={index}>
-                <span className="text-sm">{level}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {infoSynthesis.additionalConext.length > 0 && (
-          <div>
-            <p className="text-sm font-semibold mb-2">Additional Context:</p>
-            <ul className="list-disc list-inside space-y-1">
-              {infoSynthesis.additionalConext.map((context, index) => (
-                <li key={index}>
-                  <span className="text-sm">{context}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <ul className="list-disc list-outside ml-5 space-y-4 text-lg">
+          <li>{infoSynthesis.goal}</li>
+          {infoSynthesis.currentLevel.map((level, index) => (
+            <li key={`level-${index}`}>{level}</li>
+          ))}
+          {infoSynthesis.additionalConext.map((context, index) => (
+            <li key={`context-${index}`}>{context}</li>
+          ))}
+        </ul>
       </div>
 
       <div className="flex gap-4">

@@ -36,12 +36,6 @@ export default function GenerateCoursePage() {
 
   const { questions, currentQuestionIndex, isRecapScreen } = state;
 
-  // Redirect back to home if no questions exist (shouldn't happen in normal flow)
-  if (!originalPrompt || questions.length === 0) {
-    router.push('/home');
-    return null;
-  }
-
   const handleSelectOption = (optionIndex: number) => {
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
     const selectedOption = questions[currentQuestionIndex].options[optionIndex];
@@ -171,6 +165,14 @@ export default function GenerateCoursePage() {
           isGenerating={isCreatingCourse}
           isLoadingSynthesis={isGeneratingSynthesis}
         />
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <Spinner className="size-12 text-primary" />
       </div>
     );
   }
