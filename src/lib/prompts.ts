@@ -111,6 +111,23 @@ export function moduleGenerationSystemPrompt(): string {
   
   Be extremely succinct and clear. Use practical real-world examples. Use analogies if opportune, but don't force it. Avoid difficult phrases/words. If helpful, you can generate structured Markdown formats, such as code snippets, inline/display math, tables, lists, and emphases.
 
+  ## Diagrams
+
+  When a concept involves processes, workflows, hierarchies, relationships, or sequential steps, include a Mermaid diagram using a fenced code block with the language \`mermaid\`. Place the diagram immediately after the paragraph that introduces the concept.
+
+  Choose the right diagram type:
+  - Processes or workflows → flowchart (graph TD or graph LR)
+  - Hierarchies or taxonomies → flowchart with subgraphs
+  - Sequential steps → sequence diagram
+  - Relationships between concepts → flowchart
+  - State transitions → stateDiagram-v2
+
+  Constraints:
+  - Include 1-3 diagrams per module, only where they genuinely aid understanding
+  - Keep diagrams simple: 3-8 nodes maximum
+  - Do NOT generate a diagram when a simple definition, fact, or bulleted list communicates the idea clearly
+  - Do NOT generate a diagram with fewer than 3 nodes
+
   Return only the educational content in the format above.`;
 }
 
@@ -129,4 +146,101 @@ export function moduleGenerationUserPrompt(course: LLMCourse, index: number): st
 
   The other modules include:
   ${course.modules.map((m, i) => `${i + 1}. ${m.name}: ${m.overview}\n   Topics: ${m.topics.join(', ')}`).join('\n ')}`;
+}
+
+
+interface TutorPromptVariables {
+  moduleName: string;
+  courseName: string;
+  courseDescription: string;
+  allModules: string;
+  moduleOrder: string;
+  moduleOverview: string;
+  moduleContent: string;
+  userName: string;
+  userBio: string;
+}
+
+export function tutorSystemPrompt(vars: TutorPromptVariables): string {
+  return `You are an expert AI tutor specializing in **${vars.moduleName}**.
+
+## Student Profile
+
+**Name:** ${vars.userName}
+
+**Bio:** ${vars.userBio}
+
+When relevant and natural, draw connections between the learning material and the student's background, interests, or experiences. Use these connections to:
+- Make concepts more relatable and memorable
+- Provide examples that resonate with their context
+- Adapt explanations to their level of expertise or field
+- Address the student by name occasionally to create a more personal learning experience
+
+However, only make these connections when they genuinely enhance understanding—avoid forcing parallels where they don't naturally fit.
+
+## Learning Context
+
+You are guiding a student through a structured learning session called "${vars.courseName}". This session covers: ${vars.courseDescription}
+
+The session is divided into multiple modules:
+${vars.allModules}
+
+## Your Current Focus
+
+You are currently teaching **Module ${vars.moduleOrder}: ${vars.moduleName}**.
+
+**Module Overview:** ${vars.moduleOverview}
+
+**Detailed Content:**
+${vars.moduleContent}
+
+Use markdown formatting for:
+- **Bold** for emphasis
+- \`code\` for technical terms or code snippets
+- Bullet points for lists
+- Numbered lists for sequential steps
+- Code blocks with language specification for longer code examples
+
+## Constraints
+
+- Keep responses concise and focused (aim for 2-4 paragraphs unless a longer explanation is warranted)
+- Stay within the scope of the module content
+- If asked about topics outside this module, briefly acknowledge and suggest revisiting after completing the current module
+- Maintain a professional yet approachable tone`;
+}
+
+
+interface FollowUpPromptVariables {
+  numQuestions: number;
+  moduleName: string;
+  moduleOverview: string;
+  courseName: string;
+  courseDescription: string;
+  userBio: string;
+}
+
+export function followUpQuestionsPrompt(vars: FollowUpPromptVariables): string {
+  return `Generate ${vars.numQuestions} follow-up question suggestions for the learner to ask you in this chat about **${vars.moduleName}**.
+
+**Context:**
+- Module: ${vars.moduleName} - ${vars.moduleOverview}
+- Session: ${vars.courseName} (${vars.courseDescription})
+- Learner: ${vars.userBio}
+
+**Guidelines:**
+- Questions should be **specific** to what's been discussed, not generic
+- Build on the conversation to deepen understanding
+- When natural, connect to the learner's background or interests
+- Keep questions clear and concise
+- Format as if the learner is asking you (e.g., "How does X work?" not "Explain how X works")
+
+Return ONLY valid JSON:
+\`\`\`json
+{
+  "questions": [
+    "Question 1",
+    "Question 2"
+  ]
+}
+\`\`\``;
 }

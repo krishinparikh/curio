@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import "katex/dist/katex.min.css";
 import { Providers } from "./providers";
 import { LayoutWrapper } from "./LayoutWrapper";
 
@@ -28,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={geist.className}>
+      <body className={geist.className} suppressHydrationWarning>
         <Providers>
           <LayoutWrapper>
             {children}

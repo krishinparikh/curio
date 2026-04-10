@@ -11,24 +11,14 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
-// Mock OpenAI provider to prevent instantiation errors
-const { mockComplete, mockStream } = vi.hoisted(() => ({
-  mockComplete: vi.fn(),
-  mockStream: vi.fn(),
+// Mock LangChain ChatOpenAI to prevent instantiation errors
+vi.mock('@langchain/openai', () => ({
+  ChatOpenAI: class {
+    invoke = vi.fn();
+    stream = vi.fn();
+    constructor(_opts: any) {}
+  },
 }));
-
-vi.mock('@/lib/ai/providers/openai', () => {
-  return {
-    OpenAIProvider: class {
-      complete: any;
-      stream: any;
-      constructor(_model: string) {
-        this.complete = mockComplete;
-        this.stream = mockStream;
-      }
-    },
-  };
-});
 
 describe('Dashboard Service', () => {
   beforeEach(() => {

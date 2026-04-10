@@ -9,10 +9,10 @@ An AI-powered learning platform that enables users to create personalized learni
 ## Tech Stack
 
 - **Frontend**: React 19.0.0, TypeScript 5, Tailwind 3.4.18, shadcn/ui, Next.js 16.0.4 (App Router)
-- **Backend**: Next.js Server Actions, Prisma 6.19.0 (ORM), Socket.io 4.8.1 (WebSockets)
+- **Backend**: Next.js Server Actions, Prisma 6.19.0 (ORM)
 - **Database**: PostgreSQL (hosted on Neon)
 - **Authentication**: NextAuth 5.0.0-beta.29
-- **AI**: OpenAI 6.1.0 (gpt-4o-mini via LLMProvider abstraction)
+- **AI**: LangChain (@langchain/openai) with ChatOpenAI (gpt-4o-mini default)
 - **State Management**: TanStack Query 5.90.8 (React Query)
 - **Form Handling**: React Hook Form 7.65.0 with Zod 4.1.12 validation
 - **Testing**: Vitest 4.0.1, @testing-library/react 16.3.0, jsdom 27.0.1
@@ -20,11 +20,8 @@ An AI-powered learning platform that enables users to create personalized learni
 ## Development Commands
 
 ```bash
-# Start development server with Socket.io + Next.js
-npm run dev              # Starts server.ts with WebSocket support
-
-# Start Next.js only (no WebSocket)
-npm run dev:next
+# Start development server
+npm run dev
 
 # Build for production
 npm run build
@@ -115,9 +112,10 @@ The application is organized by feature with server actions in `src/lib/actions/
 - `toggleModuleCompletion(moduleId)` - Toggles module completion status
 
 #### Chat Actions (`chatActions.ts`)
-- `getMessagesForModule(moduleId)` - Retrieves chat messages from Module.messages JSON
-- `addMessageToModule({ moduleId, content, author })` - Appends message to JSON array
-- Real-time AI responses handled via WebSocket (see `src/lib/websocket/handlers.ts`)
+- `getMessages(moduleId, userId)` - Retrieves chat messages from Module.messages JSON
+- `addMessage(moduleId, message, userId)` - Appends message to JSON array
+- `createFollowUpQuestions(moduleId, userId)` - Generates follow-up questions via LangChain
+- Real-time AI responses streamed via SSE API route (`src/app/api/chat/route.ts`)
 
 #### User Actions (`userActions.ts`)
 - `getUser(userId)` - Fetches user profile
@@ -125,19 +123,18 @@ The application is organized by feature with server actions in `src/lib/actions/
 
 ### AI Integration Layer
 
-**LLMProvider Abstraction** (`src/lib/ai/LLMProvider.ts`):
-- Abstract base class for LLM integrations
-- Methods: `complete()` for single responses, `stream()` for streaming
-- Currently implemented: `OpenAIProvider` (`src/lib/ai/providers/openai.ts`)
+**LangChain** (`@langchain/openai`):
+- `ChatOpenAI` used for all LLM calls (chat streaming, follow-up questions, course generation)
+- No custom abstraction layer — uses LangChain directly
+
+**SSE Chat Streaming** (`src/app/api/chat/route.ts`):
+- POST endpoint that streams AI responses via Server-Sent Events
+- Saves messages to DB, builds LangChain message history, streams response chunks
+- Client reads stream via `fetch()` + `ReadableStream` reader
 
 **Prompts** (`src/lib/prompts/`):
 - Centralized prompt management via `getPrompt()` function
-- Prompts organized by feature (session generation, content generation, chat responses, follow-up questions)
-
-**WebSocket Handlers** (`src/lib/websocket/handlers.ts`):
-- `handleAIChatGeneration()`: Streams AI responses in real-time via Socket.io
-- Emits chunks as they arrive from OpenAI streaming API
-- Automatically stores complete message and generates follow-up questions
+- Prompts organized by feature (tutor system prompt, follow-up questions)
 
 ### Project Structure
 
@@ -150,6 +147,7 @@ src/
        MarkdownRenderer.tsx        # Markdown/LaTeX renderer for module content
 
        api/auth/[...nextauth]/     # NextAuth endpoints
+       api/chat/route.ts           # SSE streaming chat endpoint
 
        home/                       # Home page (session list)
            page.tsx
@@ -197,21 +195,15 @@ src/
            __tests__/              # Action tests
 
        ai/
-           LLMProvider.ts          # Abstract LLM provider
-           providers/openai.ts     # OpenAI implementation
-           types.ts
+           types.ts                # Message type, providers map
 
        prompts/
-           index.ts                # Centralized prompt templates
-
-       websocket/
-           handlers.ts             # Socket.io event handlers
+           index.ts                # Prompt loading and parsing
+           tutorSystemPrompt.md    # AI tutor system prompt
+           followUpQuestions.md    # Follow-up question generation prompt
 
    hooks/
        useGetUser.ts               # Get current user from NextAuth
-       useSocket.ts                # Socket.io client hook
-
-server.ts                          # Custom server with Socket.io
 prisma/schema.prisma               # Database schema
 scripts/                           # Database utilities (clean, seed, test)
 ```
@@ -225,27 +217,20 @@ Each page defines custom React Query hooks in a co-located `hooks.ts` file:
 - Handle loading states, error handling, cache invalidation, and navigation
 - Example: `src/app/home/hooks.ts` exports `useGetSessions()` and `useCreateSession()`
 
-## WebSocket Events
+## SSE Chat Streaming
 
-The application uses Socket.io for real-time AI chat streaming:
+AI chat responses are streamed via Server-Sent Events through a Next.js API route:
 
-**Server** (`server.ts`):
-- Path: `/api/socket`
-- CORS configured for development
+**Endpoint**: `POST /api/chat` (`src/app/api/chat/route.ts`)
+- Request: `{ moduleId, message, userId, model? }`
+- Auth: Validates NextAuth session
+- Streams: `data: {"type":"chunk","content":"..."}\n\n`
+- Event types: `chunk`, `complete`, `error`
 
-**Client** (`src/hooks/useSocket.ts`):
-- Automatically connects to Socket.io server
-- Provides hook for emitting events and listening to responses
-
-**Events**:
-- `ai:chat:generate` - Client sends message to generate AI response
-  - Payload: `{ moduleId: string, userMessage: string }`
-- `ai:chat:chunk` - Server streams response chunks
-  - Payload: `{ content: string }`
-- `ai:chat:complete` - Server sends final message with follow-ups
-  - Payload: `{ message: Message, followUpQuestions: string[] }`
-- `ai:chat:error` - Server sends error
-  - Payload: `{ error: string }`
+**Client** (`useAIChat` hook in module page):
+- Uses `fetch()` with `ReadableStream` reader
+- Parses SSE events and updates streaming state
+- Supports `AbortController` for cancellation
 
 ## Testing Framework
 
@@ -266,7 +251,7 @@ All server action tests are located in `src/lib/actions/__tests__/`:
 
 ### Mocking Patterns
 - **Prisma**: Mocked via `vi.mock('@/lib/db')` with `vi.mocked(prisma.model.method)`
-- **OpenAI/LLMProvider**: Mock the provider classes in `src/lib/ai/`
+- **LangChain**: Mock `@langchain/openai` ChatOpenAI class
 - **Environment Variables**: Set in `vitest.setup.ts` to avoid missing .env in CI/CD
 
 ### Running Tests
@@ -280,21 +265,20 @@ npm run test:coverage    # Run with coverage report
 
 **Model**: gpt-4o-mini (fast and cost-effective for educational content)
 
-**LLMProvider Abstraction**:
-- Abstract class in `src/lib/ai/LLMProvider.ts` defines interface
-- `OpenAIProvider` implementation in `src/lib/ai/providers/openai.ts`
-- Methods: `complete()` for single responses, `stream()` for real-time streaming
+**LangChain Integration**:
+- `ChatOpenAI` from `@langchain/openai` used for all LLM calls
+- Course generation uses dedicated LangChain agents (`src/lib/course_generation/`)
+- Chat streaming and follow-up questions use `ChatOpenAI` directly
 
 **Prompts**:
 - Centralized in `src/lib/prompts/index.ts` via `getPrompt()` function
-- Organized by feature: session generation, module content, chat responses, follow-up questions
-- Each prompt includes system instructions and user context
+- Markdown template files with `{{variable}}` interpolation
 
 **Streaming Flow**:
-1. User sends message via WebSocket (`ai:chat:generate`)
-2. Server handler calls `LLMProvider.stream()` with message history
-3. Server emits chunks as they arrive (`ai:chat:chunk`)
-4. Server stores complete message and generates follow-ups (`ai:chat:complete`)
+1. User sends message via `fetch('/api/chat')`
+2. API route saves message, builds LangChain messages, calls `chatModel.stream()`
+3. Chunks sent as SSE events (`data: {"type":"chunk","content":"..."}\n\n`)
+4. Complete message saved to DB, `complete` event sent to client
 
 **Module Content Rendering**:
 - Markdown rendered with `react-markdown`
@@ -329,15 +313,9 @@ NEXTAUTH_URL="http://localhost:3000"      # Application URL
 - JSON columns for messages and follow-up questions (not separate tables)
 
 ### Real-Time Features
-- Socket.io runs on custom server (`server.ts`)
-- WebSocket path: `/api/socket`
-- Streaming AI responses for better UX
+- AI chat streaming via SSE (Server-Sent Events) through `/api/chat` route
+- Single `npm run dev` process — no separate server needed
 - Auto-generates follow-up questions after each AI response
-
-### Development Server
-- **IMPORTANT**: Use `npm run dev` (not `npm run dev:next`) to enable WebSocket support
-- `npm run dev` starts `server.ts` which runs Next.js + Socket.io
-- `npm run dev:next` starts only Next.js (WebSocket features won't work)
 
 ### TypeScript
 - Strict mode enabled

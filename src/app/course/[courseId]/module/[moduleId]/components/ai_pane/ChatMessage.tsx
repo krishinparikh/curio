@@ -3,7 +3,9 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import MarkdownRenderer from "@/app/MarkdownRenderer";
+import { Streamdown } from "streamdown";
+import { code } from "@streamdown/code";
+import { math } from "@streamdown/math";
 
 const chatMessageVariants = cva(
   "break-words",
@@ -42,9 +44,9 @@ const ChatMessage = React.memo(React.forwardRef<HTMLDivElement, ChatMessageProps
             className
           )}
         >
-          <div className="prose prose-base dark:prose-invert max-w-none w-full min-w-0">
-            <MarkdownRenderer>{content}</MarkdownRenderer>
-          </div>
+          <Streamdown plugins={{ code, math }}>
+            {content}
+          </Streamdown>
         </div>
       </div>
     );

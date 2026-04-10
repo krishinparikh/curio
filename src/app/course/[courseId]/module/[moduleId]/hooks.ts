@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSocket } from '@/hooks/useSocket';
 import { getMessages, createFollowUpQuestions } from '@/lib/actions/chatActions';
-import { getModuleById, addCurrentFollowUps, getCurrentFollowUps, markModuleComplete, getModules } from '@/lib/actions/moduleActions';
+import { getModuleById, addCurrentFollowUps, getCurrentFollowUps, markModuleComplete } from '@/lib/actions/moduleActions';
 import { Message } from '@/lib/ai/types';
 
 interface UseAIChatOptions {
@@ -17,128 +16,126 @@ interface UseAIChatReturn {
   streamingMessage: string;
   isStreaming: boolean;
   isGeneratingFollowUps: boolean;
-  sendMessage: (content: string) => void;
+  sendMessage: (content: string, model?: string) => void;
   error: string | null;
 }
 
-
-/**
- * Custom hook for AI chat functionality within a module
- * Manages message state, streaming responses, and WebSocket communication
- */
 export function useAIChat({ moduleId, userId }: UseAIChatOptions): UseAIChatReturn {
-  const { emit, on, off, isConnected } = useSocket();
   const queryClient = useQueryClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [streamingMessage, setStreamingMessage] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isGeneratingFollowUps, setIsGeneratingFollowUps] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  /**
-   * Send a message to the AI
-   */
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
   const sendMessage = useCallback(
-    (content: string) => {
-      if (!isConnected) {
-        setError('Not connected to server');
-        return;
-      }
-
+    async (content: string, model?: string) => {
       if (!content.trim()) {
         setError('Message cannot be empty');
         return;
       }
 
       // Add user message to local state immediately
-      const userMessage: Message = {
-        role: 'user',
-        content: content.trim(),
-      };
+      const userMessage: Message = { role: 'user', content: content.trim() };
       setMessages((prev) => [...prev, userMessage]);
 
-      // Clear any previous errors
       setError(null);
       setStreamingMessage('');
       setIsStreaming(true);
 
-      // Emit message to server
-      emit('ai:chat:generate', {
-        moduleId,
-        message: content.trim(),
-        userId,
-      });
-    },
-    [moduleId, userId, isConnected, emit]
-  );
+      // Abort any previous request
+      abortControllerRef.current?.abort();
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
 
-  // Set up event listeners
-  useEffect(() => {
-    // Handle streaming chunks
-    const handleChunk = (data: { chunk: string }) => {
-      setStreamingMessage((prev) => prev + data.chunk);
-    };
-
-    // Handle completion
-    const handleComplete = async (data: { message: string; moduleId: string }) => {
-      if (data.moduleId === moduleId) {
-        // Add complete assistant message to messages
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: data.message,
-        };
-
-        let updatedMessages: Message[] = [];
-        setMessages((prev) => {
-          updatedMessages = [...prev, assistantMessage];
-          return updatedMessages;
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ moduleId, message: content.trim(), userId, model }),
+          signal: abortController.signal,
         });
 
-        // Reset streaming state
-        setStreamingMessage('');
-        setIsStreaming(false);
-
-        // Start generating follow-up questions
-        setIsGeneratingFollowUps(true);
-
-        // Clear old follow-up questions immediately to show skeleton
-        queryClient.resetQueries({ queryKey: ['currentFollowUps', moduleId] });
-
-        // Generate and save follow-up questions after state is updated
-        try {
-          const result = await createFollowUpQuestions(moduleId, userId, 3);
-          if (result?.questions) {
-            await addCurrentFollowUps(moduleId, result.questions);
-            // Invalidate to refetch and show new follow-ups
-            queryClient.invalidateQueries({ queryKey: ['currentFollowUps', moduleId] });
-          }
-        } catch (err) {
-          console.error('Failed to generate/save follow-up questions:', err);
-        } finally {
-          setIsGeneratingFollowUps(false);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to send message');
         }
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response stream');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullResponse = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          // Keep the last potentially incomplete line in the buffer
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const jsonStr = line.slice(6);
+            if (!jsonStr) continue;
+
+            try {
+              const data = JSON.parse(jsonStr);
+
+              if (data.type === 'chunk') {
+                fullResponse += data.content;
+                setStreamingMessage((prev) => prev + data.content);
+              } else if (data.type === 'complete') {
+                const assistantMessage: Message = { role: 'assistant', content: data.message };
+                setMessages((prev) => [...prev, assistantMessage]);
+                setStreamingMessage('');
+                setIsStreaming(false);
+
+                // Generate follow-up questions
+                setIsGeneratingFollowUps(true);
+                queryClient.resetQueries({ queryKey: ['currentFollowUps', moduleId] });
+
+                try {
+                  const result = await createFollowUpQuestions(moduleId, userId, 3);
+                  if (result?.questions) {
+                    await addCurrentFollowUps(moduleId, result.questions);
+                    queryClient.invalidateQueries({ queryKey: ['currentFollowUps', moduleId] });
+                  }
+                } catch (err) {
+                  console.error('Failed to generate follow-up questions:', err);
+                } finally {
+                  setIsGeneratingFollowUps(false);
+                }
+              } else if (data.type === 'error') {
+                setError(data.error);
+                setIsStreaming(false);
+                setStreamingMessage('');
+              }
+            } catch {
+              // Skip malformed JSON lines
+            }
+          }
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'Unknown error');
+        setIsStreaming(false);
+        setStreamingMessage('');
       }
-    };
-
-    // Handle errors
-    const handleError = (data: { error: string }) => {
-      setError(data.error);
-      setIsStreaming(false);
-      setStreamingMessage('');
-    };
-
-    // Register listeners
-    on('ai:chat:chunk', handleChunk);
-    on('ai:chat:complete', handleComplete);
-    on('ai:chat:error', handleError);
-
-    // Cleanup listeners on unmount
-    return () => {
-      off('ai:chat:chunk', handleChunk);
-      off('ai:chat:complete', handleComplete);
-      off('ai:chat:error', handleError);
-    };
-  }, [moduleId, on, off, queryClient]);
+    },
+    [moduleId, userId, queryClient]
+  );
 
   return {
     messages,
@@ -150,10 +147,6 @@ export function useAIChat({ moduleId, userId }: UseAIChatOptions): UseAIChatRetu
   };
 }
 
-/**
- * Custom hook to fetch and manage chat message history for a module
- * Retrieves all messages stored in the database for the given module
- */
 export function useGetMessages(moduleId: string, userId: string) {
   return useQuery({
     queryKey: ['messages', moduleId],
@@ -162,10 +155,6 @@ export function useGetMessages(moduleId: string, userId: string) {
   });
 }
 
-/**
- * Custom hook to fetch and manage module data
- * Retrieves module information including learning session context
- */
 export function useGetModule(moduleId: string, userId: string) {
   return useQuery({
     queryKey: ['module', moduleId],
@@ -174,10 +163,6 @@ export function useGetModule(moduleId: string, userId: string) {
   });
 }
 
-/**
- * Custom hook to get current follow-up questions for a module
- * Retrieves the stored follow-up questions from the database
- */
 export function useGetCurrentFollowUps(moduleId: string) {
   return useQuery({
     queryKey: ['currentFollowUps', moduleId],
@@ -188,33 +173,22 @@ export function useGetCurrentFollowUps(moduleId: string) {
   });
 }
 
-/**
- * Custom hook to add follow-up questions to a module
- * Wraps the addCurrentFollowUps action in a mutation for state management
- */
 export function useAddFollowUps(moduleId: string) {
   return useMutation({
     mutationFn: (followUps: unknown) => addCurrentFollowUps(moduleId, followUps),
   });
 }
 
-/**
- * Custom hook to mark a module as complete
- * Invalidates relevant queries to refresh UI state
- */
 export function useMarkModuleComplete(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (moduleId: string) => markModuleComplete(moduleId, userId),
     onSuccess: (data, moduleId) => {
-      // Invalidate module queries to refresh completion status
       queryClient.invalidateQueries({ queryKey: ['module', moduleId] });
 
-      // Invalidate modules query to refresh the list
       if (data.module.courseId) {
         queryClient.invalidateQueries({ queryKey: ['modules', data.module.courseId] });
-        // Invalidate course query to refresh module completion status on course page
         queryClient.invalidateQueries({ queryKey: ['course', data.module.courseId] });
       }
     },

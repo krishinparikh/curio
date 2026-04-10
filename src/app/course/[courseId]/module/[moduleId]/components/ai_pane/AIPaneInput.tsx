@@ -17,7 +17,7 @@ import {
 import { providers } from "@/lib/ai/types";
 
 interface AIPaneInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, model?: string) => void;
   isStreaming: boolean;
 }
 
@@ -29,7 +29,7 @@ export function AIPaneInput({ onSendMessage, isStreaming }: AIPaneInputProps) {
   const handleSendMessage = () => {
     if (!inputValue.trim() || isStreaming) return;
 
-    onSendMessage(inputValue);
+    onSendMessage(inputValue, providers[selectedProvider]);
     setInputValue("");
   };
 

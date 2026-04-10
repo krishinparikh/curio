@@ -2,8 +2,9 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma/db';
-import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { getPrompt } from '@/lib/old_prompts';
+import { ChatOpenAI } from '@langchain/openai';
+import { SystemMessage, HumanMessage, AIMessage } from '@langchain/core/messages';
+import { followUpQuestionsPrompt } from '@/lib/prompts';
 import { Message } from '@/lib/ai/types';
 import { getModuleById } from './moduleActions';
 import { getUserData } from './userActions';
@@ -93,11 +94,13 @@ export async function createFollowUpQuestions(
     // Use last 10 messages for context (or all if fewer than 10)
     const contextMessages = messages.slice(-10);
 
-    // Initialize OpenAI provider
-    const provider = new OpenAIProvider('gpt-4o-mini');
+    const model = new ChatOpenAI({
+      modelName: 'gpt-4o-mini',
+      temperature: 0.7,
+      maxTokens: 500,
+    });
 
-    // Prepare the prompt for generating follow-up questions with module and user context
-    const prompt = getPrompt('followUpQuestions.md', {
+    const systemPrompt = followUpQuestionsPrompt({
       numQuestions,
       moduleName: moduleData.name,
       moduleOverview: moduleData.overview,
@@ -106,31 +109,29 @@ export async function createFollowUpQuestions(
       userBio,
     });
 
-    const systemPrompt: Message = {
-      role: 'system',
-      content: prompt.system,
-    };
+    const langchainMessages = [
+      new SystemMessage(systemPrompt),
+      ...contextMessages.map((msg) =>
+        msg.role === 'user'
+          ? new HumanMessage(msg.content)
+          : new AIMessage(msg.content)
+      ),
+    ];
 
-    // Combine system prompt with conversation context
-    const promptMessages: Message[] = [systemPrompt, ...contextMessages];
-
-    // Debug: Log what we're sending to OpenAI
-    console.log('[Follow-up Questions Debug]', {
-      systemPromptLength: systemPrompt.content.length,
-      systemPromptPreview: systemPrompt.content.substring(0, 200),
-      contextMessageCount: contextMessages.length,
-      totalMessageCount: promptMessages.length,
+    const result = await model.invoke(langchainMessages, {
+      response_format: { type: 'json_object' },
     });
 
-    // Call OpenAI to generate questions
-    const response = await provider.complete(promptMessages, {
-      temperature: 0.7,
-      maxTokens: 500,
-      responseFormat: 'json_object',
-    });
+    const responseText = typeof result.content === 'string' ? result.content : '';
 
-    // Parse the JSON response
-    const parsedResponse = JSON.parse(response);
+    // Clean markdown code blocks if present
+    let cleaned = responseText.trim();
+    const codeBlockMatch = cleaned.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/);
+    if (codeBlockMatch) {
+      cleaned = codeBlockMatch[1].trim();
+    }
+
+    const parsedResponse = JSON.parse(cleaned);
 
     // Validate response structure
     if (!parsedResponse.questions || !Array.isArray(parsedResponse.questions)) {

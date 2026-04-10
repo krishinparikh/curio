@@ -49,9 +49,7 @@ export default function ModulePage({ params }: ModulePageProps) {
         </Panel>
 
         {/* Resize Handle - only visible when pane is open on desktop */}
-        {isPaneOpen && (
-          <PanelResizeHandle className="hidden md:block w-1 bg-border cursor-col-resize" />
-        )}
+        <PanelResizeHandle className={`w-1 bg-border cursor-col-resize ${isPaneOpen ? 'hidden md:block' : 'hidden'}`} />
 
         {/* Right: AI Chat Pane - handles its own Panel wrapper */}
         <AIPane moduleId={moduleId} userId={userId} open={isPaneOpen} onOpenChange={setIsPaneOpen} />

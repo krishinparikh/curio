@@ -2,7 +2,15 @@
 
 import { useSession } from 'next-auth/react';
 import { useGetModule } from '../hooks';
-import MarkdownRenderer from '@/app/MarkdownRenderer';
+import { Streamdown, type CustomRenderer } from 'streamdown';
+import { code } from '@streamdown/code';
+import { math } from '@streamdown/math';
+import { ExcalidrawDiagram } from '@/components/ExcalidrawDiagram';
+
+const mermaidRenderer: CustomRenderer = {
+  language: 'mermaid',
+  component: ({ code }) => <ExcalidrawDiagram mermaidSource={code} />,
+};
 
 interface ContentProps {
   moduleId: string;
@@ -46,9 +54,9 @@ export function Content({ moduleId, isPaneOpen }: ContentProps) {
   return (
     <div className={containerClasses}>
       <div className="bg-card rounded p-4 md:p-10 shadow">
-        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
-          <MarkdownRenderer>{getModuleQuery.data.content}</MarkdownRenderer>
-        </div>
+        <Streamdown plugins={{ code, math, renderers: [mermaidRenderer] }}>
+          {getModuleQuery.data.content}
+        </Streamdown>
       </div>
     </div>
   );

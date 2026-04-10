@@ -22,18 +22,15 @@ export function AIPane({ moduleId, userId, open, onOpenChange }: AIPaneProps) {
   // Fetch chat history
   const getMessagesQuery = useGetMessages(moduleId, userId);
 
-  // WebSocket AI chat integration
+  // SSE AI chat integration
   const { messages, streamingMessage, isStreaming, isGeneratingFollowUps, sendMessage, error } = useAIChat({
     moduleId,
     userId,
   });
 
-  // Combine database messages with WebSocket messages and streaming message for display
+  // Combine database messages with session messages and streaming message for display
   const displayMessages = useMemo(() => {
-    // Start with messages from database
     const dbMessages = getMessagesQuery.data || [];
-
-    // Add WebSocket messages (from current session)
     const allMessages = [...dbMessages, ...messages];
 
     // Add streaming message if AI is currently responding
@@ -67,16 +64,12 @@ export function AIPane({ moduleId, userId, open, onOpenChange }: AIPaneProps) {
     }
   }, [messageCount]); // Only scroll when message count changes, not on every keystroke
 
-  if (!open) {
-    return null;
-  }
-
   return (
     <Panel
-      defaultSize={40}
-      minSize={20}
-      maxSize={70}
-      className="bg-card border-l border-border flex flex-col overflow-hidden md:flex fixed md:relative inset-0 md:inset-auto w-full md:w-auto z-50 md:z-auto transition-transform duration-300 ease-in-out animate-in slide-in-from-right md:animate-none"
+      defaultSize={open ? 40 : 0}
+      minSize={open ? 20 : 0}
+      maxSize={open ? 70 : 0}
+      className={`bg-card border-l border-border flex flex-col overflow-hidden md:flex fixed md:relative inset-0 md:inset-auto w-full md:w-auto z-50 md:z-auto transition-transform duration-300 ease-in-out animate-in slide-in-from-right md:animate-none ${!open ? 'hidden' : ''}`}
     >
       {/* AI Pane Header - Mobile Only */}
       <AIPaneHeader onClose={() => onOpenChange(false)} />
@@ -125,8 +118,7 @@ export function AIPane({ moduleId, userId, open, onOpenChange }: AIPaneProps) {
         )}
       </div>
 
-      {/* Message Input Area */}
-      <AIPaneInput onSendMessage={sendMessage} isStreaming={isStreaming} />
+      <AIPaneInput onSendMessage={(message, model) => sendMessage(message, model)} isStreaming={isStreaming} />
     </Panel>
   );
 }

@@ -6,6 +6,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/streamdown/dist/**/*.js",
   ],
   theme: {
   	extend: {
@@ -83,58 +84,8 @@ const config: Config = {
   				ring: 'var(--sidebar-ring)'
   			}
   		},
-  		typography: {
-  			DEFAULT: {
-  				css: {
-  					maxWidth: 'none',
-  					p: {
-  						marginTop: '1.5rem',
-  						marginBottom: '1.5rem'
-  					},
-  					'p:first-child': {
-  						marginTop: '0'
-  					},
-  					'p:last-child': {
-  						marginBottom: '0'
-  					},
-  					h1: {
-  						marginTop: '2rem',
-  						marginBottom: '1.5rem'
-  					},
-  					'h1:first-child': {
-  						marginTop: '0'
-  					},
-  					h2: {
-  						marginTop: '2rem',
-  						marginBottom: '1.5rem'
-  					},
-  					'h2:first-child': {
-  						marginTop: '0'
-  					},
-  					h3: {
-  						marginTop: '1.75rem',
-  						marginBottom: '1.25rem'
-  					},
-  					'h3:first-child': {
-  						marginTop: '0'
-  					},
-  					ul: {
-  						marginTop: '1.5rem',
-  						marginBottom: '1.5rem'
-  					},
-  					ol: {
-  						marginTop: '1.5rem',
-  						marginBottom: '1.5rem'
-  					},
-  					li: {
-  						marginTop: '0.75rem',
-  						marginBottom: '0.75rem'
-  					}
-  				}
-  			}
-  		}
   	}
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [require("tailwindcss-animate")],
 };
 export default config;

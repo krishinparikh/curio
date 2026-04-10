@@ -17,24 +17,19 @@ vi.mock('@/lib/db', () => ({
 }));
 
 // Create mocks using vi.hoisted for proper hoisting
-const { mockComplete, mockStream } = vi.hoisted(() => ({
-  mockComplete: vi.fn(),
+const { mockInvoke, mockStream } = vi.hoisted(() => ({
+  mockInvoke: vi.fn(),
   mockStream: vi.fn(),
 }));
 
-// Mock OpenAI provider
-vi.mock('@/lib/ai/providers/openai', () => {
-  return {
-    OpenAIProvider: class {
-      complete: any;
-      stream: any;
-      constructor(_model: string) {
-        this.complete = mockComplete;
-        this.stream = mockStream;
-      }
-    },
-  };
-});
+// Mock LangChain ChatOpenAI
+vi.mock('@langchain/openai', () => ({
+  ChatOpenAI: class {
+    invoke = mockInvoke;
+    stream = mockStream;
+    constructor(_opts: any) {}
+  },
+}));
 
 describe('sessionService', () => {
   beforeEach(() => {
@@ -94,7 +89,7 @@ describe('sessionService', () => {
       });
 
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-      mockComplete.mockResolvedValue(mockAIResponse);
+      mockInvoke.mockResolvedValue({ content: mockAIResponse });
       vi.mocked(prisma.learningSession.create).mockResolvedValue(mockSession as any);
 
       const result = await createLearningSession({
@@ -108,7 +103,7 @@ describe('sessionService', () => {
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-123' },
       });
-      expect(mockComplete).toHaveBeenCalled();
+      expect(mockInvoke).toHaveBeenCalled();
       expect(prisma.learningSession.create).toHaveBeenCalled();
     });
 
@@ -151,7 +146,7 @@ describe('sessionService', () => {
       };
 
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-      mockComplete.mockRejectedValue(new Error('OpenAI API error'));
+      mockInvoke.mockRejectedValue(new Error('OpenAI API error'));
       vi.mocked(prisma.learningSession.create).mockResolvedValue(mockSessionWithFallback as any);
 
       const result = await createLearningSession({
